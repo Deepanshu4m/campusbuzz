@@ -2,6 +2,7 @@ import express from "express";
 import cors from "cors";
 import cookieParser from "cookie-parser";
 import authRouter from "./routes/auth.routes.js";
+import eventRouter from "./routes/event.routes.js";
 
 const app = express();
 
@@ -13,6 +14,7 @@ app.use(cookieParser());
 
 // routes
 app.use("/api/v1/auth", authRouter);
+app.use("/api/v1/events", eventRouter);
 
 // global error handler
 app.use((err, req, res, next) => {
