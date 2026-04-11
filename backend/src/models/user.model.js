@@ -13,9 +13,9 @@ const userSchema = new Schema(
       enum: Object.values(ROLES),
       default: ROLES.STUDENT,
     },
-    usn: { type: String, default: "" }, // for students
+    usn: { type: String, default: "" }, 
     department: { type: String, default: "" },
-    avatar: { type: String, default: "" }, // cloudinary url
+    avatar: { type: String, default: "" }, 
     refreshToken: { type: String },
     badges: [{ type: String }],
   },

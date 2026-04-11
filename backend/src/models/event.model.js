@@ -6,7 +6,7 @@ const eventSchema = new Schema(
     description: { type: String, required: true },
     date: { type: Date, required: true },
     venue: { type: String, required: true },
-    banner: { type: String, default: "" }, // cloudinary url
+    banner: { type: String, default: "" }, 
     category: { type: String, default: "General" },
     capacity: { type: Number, default: 100 },
     registeredCount: { type: Number, default: 0 },
@@ -21,7 +21,7 @@ const eventSchema = new Schema(
       ref: "User",
       required: true,
     },
-    certificateTemplate: { type: String, default: "" }, // cloudinary url if custom
+    certificateTemplate: { type: String, default: "" }, 
   },
   { timestamps: true }
 );
