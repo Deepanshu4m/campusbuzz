@@ -1,0 +1,26 @@
+import { BrowserRouter, Routes, Route } from "react-router-dom";
+import QRDisplay from "./components/QRDisplay.jsx";
+import QRScanner from "./components/QRScanner.jsx";
+
+function App() {
+  return (
+    <BrowserRouter>
+      <Routes>
+        <Route
+          path="/"
+          element={
+            <div className="max-w-md mx-auto mt-10 flex flex-col gap-8">
+              <QRDisplay
+                qrCode="data:image/png;base64,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"
+                eventTitle="Test Event"
+              />
+              <QRScanner eventId="69da3d86db0385f89b7fb06c" />
+            </div>
+          }
+        />
+      </Routes>
+    </BrowserRouter>
+  );
+}
+
+export default App;
