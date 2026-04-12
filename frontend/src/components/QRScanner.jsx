@@ -29,7 +29,6 @@ function QRScanner({ eventId }) {
                 async (decodedText) => {
                     await scannerRef.current.stop();
                     setScanning(false);
-                    console.log("Scanned text:", decodedText);
 
                     try {
 
