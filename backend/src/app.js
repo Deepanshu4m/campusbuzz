@@ -4,6 +4,7 @@ import cookieParser from "cookie-parser";
 import authRouter from "./routes/auth.routes.js";
 import eventRouter from "./routes/event.routes.js";
 import registrationRouter from "./routes/registration.routes.js";
+import attendanceRouter from "./routes/attendance.routes.js";
 
 const app = express();
 
@@ -17,6 +18,7 @@ app.use(cookieParser());
 app.use("/api/v1/auth", authRouter);
 app.use("/api/v1/events", eventRouter);
 app.use("/api/v1/registrations", registrationRouter);
+app.use("/api/v1/attendance", attendanceRouter);
 
 // global error handler
 app.use((err, req, res, next) => {

@@ -1,3 +1,4 @@
+import { v4 as uuidv4 } from "uuid";
 import QRCode from "qrcode";
 import { Registration } from "../models/registration.model.js";
 import { Event } from "../models/event.model.js";
@@ -17,14 +18,16 @@ const registerForEvent = asyncHandler(async (req, res) => {
     event: req.params.eventId,
   });
   if (existing) throw new ApiError(409, "You are already registered for this event");
-
-  const qrData = `campusbuzz::${req.user._id}::${req.params.eventId}::${Date.now()}`;
+  
+  const qrToken = uuidv4();
+  const qrData = JSON.stringify({ qrToken, eventId: req.params.eventId });
   const qrCode = await QRCode.toDataURL(qrData);
 
   const registration = await Registration.create({
     user: req.user._id,
     event: req.params.eventId,
     qrCode,
+    qrToken,
   });
 
   await Event.findByIdAndUpdate(req.params.eventId, { $inc: { registeredCount: 1 } });
