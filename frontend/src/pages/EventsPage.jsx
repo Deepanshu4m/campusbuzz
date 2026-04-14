@@ -34,7 +34,7 @@ function EventsPage() {
     setMessage({ id: null, text: "", success: false });
 
     try {
-      await api.post(`/registrations/${eventId}`);
+      await api.post(`/registrations/${eventId}/register`);
       setMessage({ id: eventId, text: "Registered successfully!", success: true });
     } catch (err) {
       setMessage({
