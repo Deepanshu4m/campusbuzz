@@ -5,6 +5,7 @@ import { Event } from "../models/event.model.js";
 import { ApiError } from "../utils/ApiError.js";
 import { ApiResponse } from "../utils/ApiResponse.js";
 import { asyncHandler } from "../utils/asyncHandler.js";
+import { sendRegistrationEmail } from "../utils/sendEmail.js";
 
 const registerForEvent = asyncHandler(async (req, res) => {
   const event = await Event.findById(req.params.eventId);
@@ -31,6 +32,12 @@ const registerForEvent = asyncHandler(async (req, res) => {
   });
 
   await Event.findByIdAndUpdate(req.params.eventId, { $inc: { registeredCount: 1 } });
+  sendRegistrationEmail(
+  req.user.email,
+  req.user.name,
+  event,
+  qrCode
+).catch((err) => console.error("Email sending failed:", err));
 
   res.status(201).json(new ApiResponse(201, registration, "Registered successfully"));
 });
