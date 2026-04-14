@@ -40,7 +40,6 @@ function MyRegistrations() {
   return (
     <div className="min-h-screen bg-gray-50">
 
-      {/* Navbar */}
       <div className="bg-white border-b border-gray-200 px-6 py-4 flex items-center justify-between">
         <h1 className="text-lg font-semibold text-indigo-600">CampusBuzz</h1>
         <Link
@@ -51,7 +50,6 @@ function MyRegistrations() {
         </Link>
       </div>
 
-      {/* Content */}
       <div className="max-w-2xl mx-auto px-6 py-8">
         <h2 className="text-xl font-semibold text-gray-900 mb-6">My Registrations</h2>
 
