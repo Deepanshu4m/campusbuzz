@@ -1,14 +1,13 @@
 import { useEffect, useState } from "react";
-import { useNavigate, Link } from "react-router-dom";
+import { Link } from "react-router-dom";
 import api from "../utils/axios.js";
 import QRDisplay from "../components/QRDisplay.jsx";
 
 function MyRegistrations() {
-  const navigate = useNavigate();
-
   const [registrations, setRegistrations] = useState([]);
   const [loading, setLoading] = useState(true);
   const [expandedId, setExpandedId] = useState(null);
+  const [downloadingId, setDownloadingId] = useState(null);
 
   useEffect(() => {
     fetchMyRegistrations();
@@ -37,15 +36,30 @@ function MyRegistrations() {
     setExpandedId(expandedId === id ? null : id);
   };
 
+  const handleDownloadCertificate = async (registrationId, eventTitle) => {
+    setDownloadingId(registrationId);
+    try {
+      const res = await api.get(`/certificates/${registrationId}`, { responseType: "blob" });
+      const url = window.URL.createObjectURL(new Blob([res.data], { type: "application/pdf" }));
+      const link = document.createElement("a");
+      link.href = url;
+      link.setAttribute("download", `certificate-${eventTitle.replace(/\s+/g, "-")}.pdf`);
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+      window.URL.revokeObjectURL(url);
+    } catch {
+      alert("Could not download. Make sure the event is marked completed.");
+    } finally {
+      setDownloadingId(null);
+    }
+  };
+
   return (
     <div className="min-h-screen bg-gray-50">
-
       <div className="bg-white border-b border-gray-200 px-6 py-4 flex items-center justify-between">
         <h1 className="text-lg font-semibold text-indigo-600">CampusBuzz</h1>
-        <Link
-          to="/events"
-          className="text-sm text-indigo-500 hover:underline font-medium"
-        >
+        <Link to="/events" className="text-sm text-indigo-500 hover:underline font-medium">
           Browse Events
         </Link>
       </div>
@@ -58,45 +72,29 @@ function MyRegistrations() {
         ) : registrations.length === 0 ? (
           <div className="text-center py-16">
             <p className="text-gray-400 text-sm mb-3">You haven't registered for any events yet.</p>
-            <Link
-              to="/events"
-              className="text-indigo-500 text-sm font-medium hover:underline"
-            >
+            <Link to="/events" className="text-indigo-500 text-sm font-medium hover:underline">
               Browse Events
             </Link>
           </div>
         ) : (
           <div className="flex flex-col gap-4">
             {registrations.map((reg) => (
-              <div
-                key={reg._id}
-                className="bg-white rounded-2xl border border-gray-200 shadow-sm p-5"
-              >
+              <div key={reg._id} className="bg-white rounded-2xl border border-gray-200 shadow-sm p-5">
                 <div className="flex items-start justify-between">
                   <div>
-                    <h3 className="text-base font-semibold text-gray-900">
-                      {reg.event?.title}
-                    </h3>
+                    <h3 className="text-base font-semibold text-gray-900">{reg.event?.title}</h3>
                     <p className="text-xs text-gray-500 mt-0.5">
                       {formatDate(reg.event?.date)} · {reg.event?.venue}
                     </p>
                     <div className="flex items-center gap-2 mt-2">
-                      <span
-                        className={`text-xs px-2 py-0.5 rounded-full font-medium ${
-                          reg.attended
-                            ? "bg-green-50 text-green-600"
-                            : "bg-yellow-50 text-yellow-600"
-                        }`}
-                      >
+                      <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${
+                        reg.attended ? "bg-green-50 text-green-600" : "bg-yellow-50 text-yellow-600"
+                      }`}>
                         {reg.attended ? "Attended ✓" : "Not attended yet"}
                       </span>
-                      <span
-                        className={`text-xs px-2 py-0.5 rounded-full font-medium ${
-                          reg.event?.status === "upcoming"
-                            ? "bg-indigo-50 text-indigo-500"
-                            : "bg-gray-100 text-gray-500"
-                        }`}
-                      >
+                      <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${
+                        reg.event?.status === "upcoming" ? "bg-indigo-50 text-indigo-500" : "bg-gray-100 text-gray-500"
+                      }`}>
                         {reg.event?.status}
                       </span>
                     </div>
@@ -110,12 +108,26 @@ function MyRegistrations() {
                   </button>
                 </div>
 
+                {reg.attended && reg.event?.status === "completed" && (
+                  <div className="mt-4 border-t border-gray-100 pt-4">
+                    <button
+                      onClick={() => handleDownloadCertificate(reg._id, reg.event?.title)}
+                      disabled={downloadingId === reg._id}
+                      className="w-full flex items-center justify-center gap-2 bg-indigo-600 hover:bg-indigo-700 disabled:opacity-60 text-white text-sm font-medium py-2 rounded-xl transition-colors"
+                    >
+                      {downloadingId === reg._id ? (
+                        <>
+                          <span className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                          Generating...
+                        </>
+                      ) : "Download Certificate"}
+                    </button>
+                  </div>
+                )}
+
                 {expandedId === reg._id && (
                   <div className="mt-4 border-t border-gray-100 pt-4">
-                    <QRDisplay
-                      qrCode={reg.qrCode}
-                      eventTitle={reg.event?.title}
-                    />
+                    <QRDisplay qrCode={reg.qrCode} eventTitle={reg.event?.title} />
                   </div>
                 )}
               </div>

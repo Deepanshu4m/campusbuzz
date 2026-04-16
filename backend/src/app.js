@@ -5,6 +5,7 @@ import authRouter from "./routes/auth.routes.js";
 import eventRouter from "./routes/event.routes.js";
 import registrationRouter from "./routes/registration.routes.js";
 import attendanceRouter from "./routes/attendance.routes.js";
+import certificateRouter from "./routes/certificate.routes.js";
 
 const app = express();
 
@@ -21,6 +22,8 @@ app.use("/api/v1/auth", authRouter);
 app.use("/api/v1/events", eventRouter);
 app.use("/api/v1/registrations", registrationRouter);
 app.use("/api/v1/attendance", attendanceRouter);
+app.use("/api/v1/certificates", certificateRouter);
+
 
 app.use((err, req, res, next) => {
   const statusCode = err.statusCode || 500;
