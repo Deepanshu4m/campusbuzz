@@ -55,7 +55,7 @@ function Register() {
               name="name"
               value={form.name}
               onChange={handleChange}
-              placeholder="Deepanshu Bisht"
+              placeholder="Enter your full name"
               required
               className="w-full px-4 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
             />
@@ -94,7 +94,7 @@ function Register() {
               name="usn"
               value={form.usn}
               onChange={handleChange}
-              placeholder="1NT22CS001"
+              placeholder="Enter your USN"
               className="w-full px-4 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
             />
           </div>
