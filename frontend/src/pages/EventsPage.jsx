@@ -73,6 +73,16 @@ function EventsPage() {
           >
             My Registrations
           </Link>
+
+          {user?.role === "super_admin" && (
+            <button
+              onClick={() => navigate("/admin")}
+              className="px-4 py-2 bg-indigo-600 text-white rounded-lg text-sm hover:bg-indigo-700"
+            >
+              Admin Dashboard
+            </button>
+          )}
+
           <button
             onClick={handleLogout}
             className="text-sm text-gray-500 hover:text-red-500 transition"
