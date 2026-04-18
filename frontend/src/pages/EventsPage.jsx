@@ -3,6 +3,7 @@ import { useSelector, useDispatch } from "react-redux";
 import { useNavigate, Link } from "react-router-dom";
 import { logout } from "../redux/slices/authSlice.js";
 import api from "../utils/axios.js";
+import NotificationBell from "../components/NotificationBell.jsx";
 
 function EventsPage() {
   const dispatch = useDispatch();
@@ -66,6 +67,7 @@ function EventsPage() {
       <div className="bg-white border-b border-gray-200 px-6 py-4 flex items-center justify-between">
         <h1 className="text-lg font-semibold text-indigo-600">CampusBuzz</h1>
         <div className="flex items-center gap-4">
+          <NotificationBell/>
           <span className="text-sm text-gray-500">Hi, {user?.name}</span>
           <Link
             to="/my-registrations"

@@ -1,3 +1,4 @@
+import { getIO } from "../socket.js";
 import { v4 as uuidv4 } from "uuid";
 import QRCode from "qrcode";
 import { Registration } from "../models/registration.model.js";
@@ -19,7 +20,7 @@ const registerForEvent = asyncHandler(async (req, res) => {
     event: req.params.eventId,
   });
   if (existing) throw new ApiError(409, "You are already registered for this event");
-  
+
   const qrToken = uuidv4();
   const qrData = JSON.stringify({ qrToken, eventId: req.params.eventId });
   const qrCode = await QRCode.toDataURL(qrData);
@@ -31,13 +32,22 @@ const registerForEvent = asyncHandler(async (req, res) => {
     qrToken,
   });
 
+  const io = getIO();
+  io.to(event.createdBy.toString()).emit("new_registration", {
+    message: `${req.user.name} registered for "${event.title}"`,
+    eventId: event._id,
+    eventTitle: event.title,
+    userName: req.user.name,
+    timestamp: new Date(),
+  });
+
   await Event.findByIdAndUpdate(req.params.eventId, { $inc: { registeredCount: 1 } });
   sendRegistrationEmail(
-  req.user.email,
-  req.user.name,
-  event,
-  qrCode
-).catch((err) => console.error("Email sending failed:", err));
+    req.user.email,
+    req.user.name,
+    event,
+    qrCode
+  ).catch((err) => console.error("Email sending failed:", err));
 
   res.status(201).json(new ApiResponse(201, registration, "Registered successfully"));
 });
