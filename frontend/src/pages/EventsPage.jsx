@@ -61,13 +61,23 @@ function EventsPage() {
     });
   };
 
+  const isMyEvent = (event) => {
+    return event.createdBy?._id?.toString() === user?._id?.toString();
+  };
+
+  const canManageAttendance = (event) => {
+    if (user?.role === "super_admin") return true;
+    if (user?.role === "club_admin" && isMyEvent(event)) return true;
+    return false;
+  };
+
   return (
     <div className="min-h-screen bg-gray-50">
 
       <div className="bg-white border-b border-gray-200 px-6 py-4 flex items-center justify-between">
         <h1 className="text-lg font-semibold text-indigo-600">CampusBuzz</h1>
         <div className="flex items-center gap-4">
-          <NotificationBell/>
+          <NotificationBell />
           <span className="text-sm text-gray-500">Hi, {user?.name}</span>
           <Link
             to="/my-registrations"
@@ -142,10 +152,10 @@ function EventsPage() {
                   <p className="text-xs text-gray-500 mb-1">{formatDate(event.date)} · {event.venue}</p>
                   <p className="text-xs text-gray-400 mb-4 line-clamp-2">{event.description}</p>
 
-                  <div className="mt-auto">
+                  <div className="mt-auto flex flex-col gap-2">
                     {message.id === event._id && (
                       <p
-                        className={`text-xs mb-2 ${
+                        className={`text-xs ${
                           message.success ? "text-green-600" : "text-red-500"
                         }`}
                       >
@@ -170,6 +180,15 @@ function EventsPage() {
                         ? "Full"
                         : "Register"}
                     </button>
+
+                    {canManageAttendance(event) && (
+                      <Link
+                        to={`/attendance/${event._id}`}
+                        className="w-full flex items-center justify-center gap-1.5 border border-indigo-300 text-indigo-600 text-sm font-medium py-2 rounded-xl hover:bg-indigo-50 transition-colors"
+                      >
+                        Manage Attendance
+                      </Link>
+                    )}
                   </div>
                 </div>
               </div>
