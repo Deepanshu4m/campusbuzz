@@ -4,6 +4,7 @@ import { useNavigate } from "react-router-dom";
 import axiosInstance from "../utils/axios.js";
 
 const ROLES = ["student", "club_admin", "super_admin"];
+const STATUSES = ["upcoming", "ongoing", "completed", "cancelled"];
 
 export default function AdminDashboard() {
   const { user } = useSelector((state) => state.auth);
@@ -15,6 +16,7 @@ export default function AdminDashboard() {
   const [loadingUsers, setLoadingUsers] = useState(false);
   const [loadingEvents, setLoadingEvents] = useState(false);
   const [roleUpdating, setRoleUpdating] = useState(null);
+  const [statusUpdating, setStatusUpdating] = useState(null);
 
   useEffect(() => {
     if (!user || user.role !== "super_admin") {
@@ -62,6 +64,20 @@ export default function AdminDashboard() {
       console.error(err);
     } finally {
       setRoleUpdating(null);
+    }
+  };
+
+  const handleStatusChange = async (eventId, newStatus) => {
+    setStatusUpdating(eventId);
+    try {
+      await axiosInstance.patch(`/admin/events/${eventId}/status`, { status: newStatus });
+      setEvents((prev) =>
+        prev.map((ev) => (ev._id === eventId ? { ...ev, status: newStatus } : ev))
+      );
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setStatusUpdating(null);
     }
   };
 
@@ -121,13 +137,15 @@ export default function AdminDashboard() {
                       <td className="px-4 py-3 text-gray-500">{u.email}</td>
                       <td className="px-4 py-3 text-gray-500">{u.usn || "—"}</td>
                       <td className="px-4 py-3">
-                        <span className={`px-2 py-1 rounded-full text-xs font-semibold ${
-                          u.role === "super_admin"
-                            ? "bg-red-100 text-red-600"
-                            : u.role === "club_admin"
-                            ? "bg-yellow-100 text-yellow-700"
-                            : "bg-green-100 text-green-700"
-                        }`}>
+                        <span
+                          className={`px-2 py-1 rounded-full text-xs font-semibold ${
+                            u.role === "super_admin"
+                              ? "bg-red-100 text-red-600"
+                              : u.role === "club_admin"
+                              ? "bg-yellow-100 text-yellow-700"
+                              : "bg-green-100 text-green-700"
+                          }`}
+                        >
                           {u.role}
                         </span>
                       </td>
@@ -139,7 +157,9 @@ export default function AdminDashboard() {
                           className="border border-gray-200 rounded-lg px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-300 disabled:opacity-50"
                         >
                           {ROLES.map((r) => (
-                            <option key={r} value={r}>{r}</option>
+                            <option key={r} value={r}>
+                              {r}
+                            </option>
                           ))}
                         </select>
                       </td>
@@ -162,8 +182,8 @@ export default function AdminDashboard() {
                     <th className="text-left px-4 py-3">Title</th>
                     <th className="text-left px-4 py-3">Date</th>
                     <th className="text-left px-4 py-3">Venue</th>
-                    <th className="text-left px-4 py-3">Status</th>
                     <th className="text-left px-4 py-3">Created By</th>
+                    <th className="text-left px-4 py-3">Change Status</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -174,19 +194,22 @@ export default function AdminDashboard() {
                         {new Date(ev.date).toLocaleDateString()}
                       </td>
                       <td className="px-4 py-3 text-gray-500">{ev.venue || "—"}</td>
-                      <td className="px-4 py-3">
-                        <span className={`px-2 py-1 rounded-full text-xs font-semibold ${
-                          ev.status === "completed"
-                            ? "bg-gray-100 text-gray-600"
-                            : ev.status === "ongoing"
-                            ? "bg-blue-100 text-blue-600"
-                            : "bg-green-100 text-green-700"
-                        }`}>
-                          {ev.status || "upcoming"}
-                        </span>
-                      </td>
                       <td className="px-4 py-3 text-gray-500">
                         {ev.createdBy?.name || "—"}
+                      </td>
+                      <td className="px-4 py-3">
+                        <select
+                          value={ev.status || "upcoming"}
+                          disabled={statusUpdating === ev._id}
+                          onChange={(e) => handleStatusChange(ev._id, e.target.value)}
+                          className="border border-gray-200 rounded-lg px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-300 disabled:opacity-50"
+                        >
+                          {STATUSES.map((s) => (
+                            <option key={s} value={s}>
+                              {s}
+                            </option>
+                          ))}
+                        </select>
                       </td>
                     </tr>
                   ))}

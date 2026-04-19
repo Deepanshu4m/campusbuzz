@@ -10,9 +10,15 @@ import { authorizeRoles } from "../middlewares/role.middleware.js";
 
 const router = Router();
 
+router.get("/my", verifyJWT, getMyRegistrations);
+
 router.post("/:eventId/register", verifyJWT, registerForEvent);
 router.delete("/:eventId/cancel", verifyJWT, cancelRegistration);
-router.get("/my", verifyJWT, getMyRegistrations);
-router.get("/:eventId/registrations", verifyJWT, authorizeRoles("club_admin", "super_admin"), getEventRegistrations);
+router.get(
+  "/event/:eventId/list",
+  verifyJWT,
+  authorizeRoles("club_admin", "super_admin"),
+  getEventRegistrations
+);
 
 export default router;

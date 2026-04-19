@@ -8,16 +8,13 @@ function QRScanner({ eventId }) {
   const [scanning, setScanning] = useState(false);
 
   useEffect(() => {
-    const scanner = new Html5Qrcode("qr-reader");
-    scannerRef.current = scanner;
-
     return () => {
-      try {
-        if (scannerRef.current && scannerRef.current.isScanning) {
+      if (scannerRef.current) {
+        try {
           scannerRef.current.stop().catch(() => {});
+        } catch {
+          // ignore if never started
         }
-      } catch {
-        // ignore
       }
     };
   }, []);
@@ -26,12 +23,15 @@ function QRScanner({ eventId }) {
     setScanning(true);
     setStatus(null);
 
+    const scanner = new Html5Qrcode("qr-reader");
+    scannerRef.current = scanner;
+
     try {
-      await scannerRef.current.start(
+      await scanner.start(
         { facingMode: "environment" },
         { fps: 10, qrbox: 250 },
         async (decodedText) => {
-          await scannerRef.current.stop();
+          await scanner.stop();
           setScanning(false);
 
           try {
@@ -52,14 +52,10 @@ function QRScanner({ eventId }) {
           }
         }
       );
-    } catch (err) {
+    } catch {
       setScanning(false);
       setStatus({ success: false, message: "Camera access denied" });
     }
-  };
-
-  const resetScanner = () => {
-    setStatus(null);
   };
 
   return (
@@ -77,10 +73,14 @@ function QRScanner({ eventId }) {
         </button>
       )}
 
+      {scanning && (
+        <p className="text-sm text-gray-400">Scanning... point at a QR code</p>
+      )}
+
       {status && (
         <div className={`p-4 rounded-lg text-center w-full ${status.success ? "bg-green-50 text-green-700" : "bg-red-50 text-red-700"}`}>
           <p className="font-medium">{status.message}</p>
-          <button onClick={resetScanner} className="mt-2 text-sm underline">
+          <button onClick={() => setStatus(null)} className="mt-2 text-sm underline">
             Scan another
           </button>
         </div>
