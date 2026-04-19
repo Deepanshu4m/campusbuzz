@@ -7,6 +7,7 @@ import Register from "./pages/Register.jsx";
 import EventsPage from "./pages/EventsPage.jsx";
 import MyRegistrations from "./pages/MyRegistrations.jsx";
 import AdminDashboard from "./pages/AdminDashboard.jsx";
+import ClubAdminDashboard from "./pages/ClubAdminDashboard.jsx";
 import AttendancePage from "./pages/AttendancePage.jsx";
 
 function App() {
@@ -21,6 +22,7 @@ function App() {
             <Route path="/events" element={<EventsPage />} />
             <Route path="/my-registrations" element={<MyRegistrations />} />
             <Route path="/admin" element={<AdminDashboard />} />
+            <Route path="/club-dashboard" element={<ClubAdminDashboard />} />
             <Route path="/attendance/:eventId" element={<AttendancePage />} />
           </Route>
 

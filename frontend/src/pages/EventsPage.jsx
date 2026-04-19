@@ -86,6 +86,15 @@ function EventsPage() {
             My Registrations
           </Link>
 
+          {(user?.role === "club_admin" || user?.role === "super_admin") && (
+            <button
+              onClick={() => navigate("/club-dashboard")}
+              className="px-4 py-2 bg-indigo-50 border border-indigo-300 text-indigo-600 rounded-lg text-sm hover:bg-indigo-100 transition"
+            >
+              My Dashboard
+            </button>
+          )}
+
           {user?.role === "super_admin" && (
             <button
               onClick={() => navigate("/admin")}
@@ -136,13 +145,12 @@ function EventsPage() {
                       {event.category}
                     </span>
                     <span
-                      className={`text-xs px-2 py-0.5 rounded-full font-medium ${
-                        event.status === "upcoming"
+                      className={`text-xs px-2 py-0.5 rounded-full font-medium ${event.status === "upcoming"
                           ? "bg-green-50 text-green-600"
                           : event.status === "ongoing"
-                          ? "bg-yellow-50 text-yellow-600"
-                          : "bg-gray-100 text-gray-500"
-                      }`}
+                            ? "bg-yellow-50 text-yellow-600"
+                            : "bg-gray-100 text-gray-500"
+                        }`}
                     >
                       {event.status}
                     </span>
@@ -155,9 +163,8 @@ function EventsPage() {
                   <div className="mt-auto flex flex-col gap-2">
                     {message.id === event._id && (
                       <p
-                        className={`text-xs ${
-                          message.success ? "text-green-600" : "text-red-500"
-                        }`}
+                        className={`text-xs ${message.success ? "text-green-600" : "text-red-500"
+                          }`}
                       >
                         {message.text}
                       </p>
@@ -175,10 +182,10 @@ function EventsPage() {
                       {registeringId === event._id
                         ? "Registering..."
                         : !event.isOpen
-                        ? "Closed"
-                        : event.registeredCount >= event.capacity
-                        ? "Full"
-                        : "Register"}
+                          ? "Closed"
+                          : event.registeredCount >= event.capacity
+                            ? "Full"
+                            : "Register"}
                     </button>
 
                     {canManageAttendance(event) && (
