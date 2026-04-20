@@ -85,4 +85,9 @@ const refreshAccessToken = asyncHandler(async (req, res) => {
     .json(new ApiResponse(200, { accessToken }, "Access token refreshed"));
 });
 
-export { registerUser, loginUser, logoutUser, refreshAccessToken };
+const getMyBadges = asyncHandler(async (req, res) => {
+  const user = await User.findById(req.user._id).select("badges name");
+  res.status(200).json(new ApiResponse(200, { badges: user.badges }, "Badges fetched"));
+});
+
+export { registerUser, loginUser, logoutUser, refreshAccessToken, getMyBadges };

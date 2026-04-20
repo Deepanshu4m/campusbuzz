@@ -3,38 +3,46 @@ import { Link } from "react-router-dom";
 import api from "../utils/axios.js";
 import QRDisplay from "../components/QRDisplay.jsx";
 
+const BADGE_META = {
+  first_event: { label: "First Event", emoji: "🎉", desc: "Attended your first event" },
+  regular: { label: "Regular", emoji: "⭐", desc: "Attended 3 events" },
+  enthusiast: { label: "Enthusiast", emoji: "🔥", desc: "Attended 5 events" },
+};
+
 function MyRegistrations() {
   const [registrations, setRegistrations] = useState([]);
+  const [badges, setBadges] = useState([]);
   const [loading, setLoading] = useState(true);
   const [expandedId, setExpandedId] = useState(null);
   const [downloadingId, setDownloadingId] = useState(null);
 
   useEffect(() => {
-    fetchMyRegistrations();
+    fetchAll();
   }, []);
 
-  const fetchMyRegistrations = async () => {
+  const fetchAll = async () => {
     try {
-      const res = await api.get("/registrations/my");
-      setRegistrations(res.data.data);
+      const [regRes, badgeRes] = await Promise.all([
+        api.get("/registrations/my"),
+        api.get("/auth/me/badges"),
+      ]);
+      setRegistrations(regRes.data.data);
+      setBadges(badgeRes.data.data.badges);
     } catch (err) {
-      console.error("Failed to fetch registrations", err);
+      console.error("Failed to fetch data", err);
     } finally {
       setLoading(false);
     }
   };
 
-  const formatDate = (dateStr) => {
-    return new Date(dateStr).toLocaleDateString("en-IN", {
+  const formatDate = (dateStr) =>
+    new Date(dateStr).toLocaleDateString("en-IN", {
       day: "numeric",
       month: "short",
       year: "numeric",
     });
-  };
 
-  const toggleQR = (id) => {
-    setExpandedId(expandedId === id ? null : id);
-  };
+  const toggleQR = (id) => setExpandedId(expandedId === id ? null : id);
 
   const handleDownloadCertificate = async (registrationId, eventTitle) => {
     setDownloadingId(registrationId);
@@ -65,6 +73,39 @@ function MyRegistrations() {
       </div>
 
       <div className="max-w-2xl mx-auto px-6 py-8">
+        <div className="mb-8">
+          <h2 className="text-xl font-semibold text-gray-900 mb-1">My Badges</h2>
+          <p className="text-sm text-gray-400 mb-4">Earned by attending events</p>
+
+          {loading ? (
+            <div className="flex gap-3">
+              {[1, 2, 3].map((i) => (
+                <div key={i} className="animate-pulse bg-gray-200 rounded-2xl h-24 w-28" />
+              ))}
+            </div>
+          ) : badges.length === 0 ? (
+            <div className="bg-white border border-dashed border-gray-200 rounded-2xl px-6 py-5 text-center">
+              <p className="text-sm text-gray-400">No badges yet — attend events to earn them!</p>
+            </div>
+          ) : (
+            <div className="flex flex-wrap gap-3">
+              {badges.map((badge) => {
+                const meta = BADGE_META[badge] || { label: badge, emoji: "🏅", desc: "" };
+                return (
+                  <div
+                    key={badge}
+                    className="bg-white border border-indigo-100 rounded-2xl px-4 py-3 flex flex-col items-center gap-1 shadow-sm min-w-[100px]"
+                  >
+                    <span className="text-2xl">{meta.emoji}</span>
+                    <span className="text-xs font-semibold text-gray-800">{meta.label}</span>
+                    <span className="text-xs text-gray-400 text-center">{meta.desc}</span>
+                  </div>
+                );
+              })}
+            </div>
+          )}
+        </div>
+
         <h2 className="text-xl font-semibold text-gray-900 mb-6">My Registrations</h2>
 
         {loading ? (
