@@ -1,9 +1,21 @@
 import { useEffect, useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { useNavigate, Link } from "react-router-dom";
+import { motion } from "framer-motion";
+import toast from "react-hot-toast";
 import { logout } from "../redux/slices/authSlice.js";
 import api from "../utils/axios.js";
 import NotificationBell from "../components/NotificationBell.jsx";
+import { EventCardSkeleton } from "../components/ui/Skeleton.jsx";
+
+const cardVariants = {
+  hidden: { opacity: 0, y: 20 },
+  visible: (i) => ({
+    opacity: 1,
+    y: 0,
+    transition: { delay: i * 0.07, duration: 0.4, ease: "easeOut" },
+  }),
+};
 
 function EventsPage() {
   const dispatch = useDispatch();
@@ -13,7 +25,6 @@ function EventsPage() {
   const [events, setEvents] = useState([]);
   const [loading, setLoading] = useState(true);
   const [registeringId, setRegisteringId] = useState(null);
-  const [message, setMessage] = useState({ id: null, text: "", success: false });
 
   useEffect(() => {
     fetchEvents();
@@ -23,8 +34,8 @@ function EventsPage() {
     try {
       const res = await api.get("/events");
       setEvents(res.data.data.events);
-    } catch (err) {
-      console.error("Failed to fetch events", err);
+    } catch {
+      toast.error("Failed to load events");
     } finally {
       setLoading(false);
     }
@@ -32,17 +43,11 @@ function EventsPage() {
 
   const handleRegister = async (eventId) => {
     setRegisteringId(eventId);
-    setMessage({ id: null, text: "", success: false });
-
     try {
       await api.post(`/registrations/${eventId}/register`);
-      setMessage({ id: eventId, text: "Registered successfully!", success: true });
+      toast.success("Registered! Check your email for the QR code.");
     } catch (err) {
-      setMessage({
-        id: eventId,
-        text: err.response?.data?.message || "Registration failed",
-        success: false,
-      });
+      toast.error(err.response?.data?.message || "Registration failed");
     } finally {
       setRegisteringId(null);
     }
@@ -50,20 +55,18 @@ function EventsPage() {
 
   const handleLogout = () => {
     dispatch(logout());
-    navigate("/login");
+    navigate("/");
   };
 
-  const formatDate = (dateStr) => {
-    return new Date(dateStr).toLocaleDateString("en-IN", {
+  const formatDate = (dateStr) =>
+    new Date(dateStr).toLocaleDateString("en-IN", {
       day: "numeric",
       month: "short",
       year: "numeric",
     });
-  };
 
-  const isMyEvent = (event) => {
-    return event.createdBy?._id?.toString() === user?._id?.toString();
-  };
+  const isMyEvent = (event) =>
+    event.createdBy?._id?.toString() === user?._id?.toString();
 
   const canManageAttendance = (event) => {
     if (user?.role === "super_admin") return true;
@@ -73,19 +76,14 @@ function EventsPage() {
 
   return (
     <div className="min-h-screen bg-gray-50">
-
       <div className="bg-white border-b border-gray-200 px-6 py-4 flex items-center justify-between">
         <h1 className="text-lg font-semibold text-indigo-600">CampusBuzz</h1>
         <div className="flex items-center gap-4">
           <NotificationBell />
           <span className="text-sm text-gray-500">Hi, {user?.name}</span>
-          <Link
-            to="/my-registrations"
-            className="text-sm text-indigo-500 hover:underline font-medium"
-          >
+          <Link to="/my-registrations" className="text-sm text-indigo-500 hover:underline font-medium">
             My Registrations
           </Link>
-
           {(user?.role === "club_admin" || user?.role === "super_admin") && (
             <button
               onClick={() => navigate("/club-dashboard")}
@@ -94,7 +92,6 @@ function EventsPage() {
               My Dashboard
             </button>
           )}
-
           {user?.role === "super_admin" && (
             <button
               onClick={() => navigate("/admin")}
@@ -103,7 +100,6 @@ function EventsPage() {
               Admin Dashboard
             </button>
           )}
-
           <button
             onClick={handleLogout}
             className="text-sm text-gray-500 hover:text-red-500 transition"
@@ -117,22 +113,26 @@ function EventsPage() {
         <h2 className="text-xl font-semibold text-gray-900 mb-6">Upcoming Events</h2>
 
         {loading ? (
-          <p className="text-sm text-gray-400">Loading events...</p>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+            {Array.from({ length: 6 }).map((_, i) => (
+              <EventCardSkeleton key={i} />
+            ))}
+          </div>
         ) : events.length === 0 ? (
           <p className="text-sm text-gray-400">No events found.</p>
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-            {events.map((event) => (
-              <div
+            {events.map((event, i) => (
+              <motion.div
                 key={event._id}
+                custom={i}
+                variants={cardVariants}
+                initial="hidden"
+                animate="visible"
                 className="bg-white rounded-2xl border border-gray-200 shadow-sm overflow-hidden flex flex-col"
               >
                 {event.banner ? (
-                  <img
-                    src={event.banner}
-                    alt={event.title}
-                    className="w-full h-40 object-cover"
-                  />
+                  <img src={event.banner} alt={event.title} className="w-full h-40 object-cover" />
                 ) : (
                   <div className="w-full h-40 bg-indigo-50 flex items-center justify-center">
                     <span className="text-indigo-300 text-sm">No banner</span>
@@ -144,14 +144,11 @@ function EventsPage() {
                     <span className="text-xs text-indigo-500 font-medium uppercase tracking-wide">
                       {event.category}
                     </span>
-                    <span
-                      className={`text-xs px-2 py-0.5 rounded-full font-medium ${event.status === "upcoming"
-                          ? "bg-green-50 text-green-600"
-                          : event.status === "ongoing"
-                            ? "bg-yellow-50 text-yellow-600"
-                            : "bg-gray-100 text-gray-500"
-                        }`}
-                    >
+                    <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${
+                      event.status === "upcoming" ? "bg-green-50 text-green-600"
+                      : event.status === "ongoing" ? "bg-yellow-50 text-yellow-600"
+                      : "bg-gray-100 text-gray-500"
+                    }`}>
                       {event.status}
                     </span>
                   </div>
@@ -161,15 +158,6 @@ function EventsPage() {
                   <p className="text-xs text-gray-400 mb-4 line-clamp-2">{event.description}</p>
 
                   <div className="mt-auto flex flex-col gap-2">
-                    {message.id === event._id && (
-                      <p
-                        className={`text-xs ${message.success ? "text-green-600" : "text-red-500"
-                          }`}
-                      >
-                        {message.text}
-                      </p>
-                    )}
-
                     <button
                       onClick={() => handleRegister(event._id)}
                       disabled={
@@ -182,10 +170,10 @@ function EventsPage() {
                       {registeringId === event._id
                         ? "Registering..."
                         : !event.isOpen
-                          ? "Closed"
-                          : event.registeredCount >= event.capacity
-                            ? "Full"
-                            : "Register"}
+                        ? "Closed"
+                        : event.registeredCount >= event.capacity
+                        ? "Full"
+                        : "Register"}
                     </button>
 
                     {canManageAttendance(event) && (
@@ -198,7 +186,7 @@ function EventsPage() {
                     )}
                   </div>
                 </div>
-              </div>
+              </motion.div>
             ))}
           </div>
         )}

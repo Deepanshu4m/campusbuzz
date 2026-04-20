@@ -1,7 +1,9 @@
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { Provider } from "react-redux";
+import { Toaster } from "react-hot-toast";
 import { store } from "./redux/store.js";
 import ProtectedRoute from "./components/ProtectedRoute.jsx";
+import Hero from "./pages/Hero.jsx";
 import Login from "./pages/Login.jsx";
 import Register from "./pages/Register.jsx";
 import EventsPage from "./pages/EventsPage.jsx";
@@ -15,9 +17,12 @@ function App() {
     <Provider store={store}>
       <BrowserRouter>
         <Routes>
+          {/* Public routes */}
+          <Route path="/" element={<Hero />} />
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
 
+          {/* Protected routes */}
           <Route element={<ProtectedRoute />}>
             <Route path="/events" element={<EventsPage />} />
             <Route path="/my-registrations" element={<MyRegistrations />} />
@@ -26,9 +31,21 @@ function App() {
             <Route path="/attendance/:eventId" element={<AttendancePage />} />
           </Route>
 
-          <Route path="*" element={<Navigate to="/login" replace />} />
+          <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
       </BrowserRouter>
+      <Toaster
+        position="top-right"
+        toastOptions={{
+          duration: 3500,
+          style: {
+            borderRadius: "10px",
+            background: "#1e1e2e",
+            color: "#e2e8f0",
+            fontSize: "14px",
+          },
+        }}
+      />
     </Provider>
   );
 }

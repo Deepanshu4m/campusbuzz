@@ -1,7 +1,9 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
+import toast from "react-hot-toast";
 import api from "../utils/axios.js";
 import QRDisplay from "../components/QRDisplay.jsx";
+import { RegistrationCardSkeleton } from "../components/ui/Skeleton.jsx";
 
 const BADGE_META = {
   first_event: { label: "First Event", emoji: "🎉", desc: "Attended your first event" },
@@ -57,7 +59,7 @@ function MyRegistrations() {
       link.remove();
       window.URL.revokeObjectURL(url);
     } catch {
-      alert("Could not download. Make sure the event is marked completed.");
+      toast.error("Could not download. Make sure the event is marked completed.");
     } finally {
       setDownloadingId(null);
     }
@@ -107,9 +109,13 @@ function MyRegistrations() {
         </div>
 
         <h2 className="text-xl font-semibold text-gray-900 mb-6">My Registrations</h2>
-
+        
         {loading ? (
-          <p className="text-sm text-gray-400">Loading...</p>
+          <div className="flex flex-col gap-4">
+            {Array.from({ length: 3 }).map((_, i) => (
+              <RegistrationCardSkeleton key={i} />
+            ))}
+          </div>
         ) : registrations.length === 0 ? (
           <div className="text-center py-16">
             <p className="text-gray-400 text-sm mb-3">You haven't registered for any events yet.</p>
@@ -128,14 +134,12 @@ function MyRegistrations() {
                       {formatDate(reg.event?.date)} · {reg.event?.venue}
                     </p>
                     <div className="flex items-center gap-2 mt-2">
-                      <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${
-                        reg.attended ? "bg-green-50 text-green-600" : "bg-yellow-50 text-yellow-600"
-                      }`}>
+                      <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${reg.attended ? "bg-green-50 text-green-600" : "bg-yellow-50 text-yellow-600"
+                        }`}>
                         {reg.attended ? "Attended ✓" : "Not attended yet"}
                       </span>
-                      <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${
-                        reg.event?.status === "upcoming" ? "bg-indigo-50 text-indigo-500" : "bg-gray-100 text-gray-500"
-                      }`}>
+                      <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${reg.event?.status === "upcoming" ? "bg-indigo-50 text-indigo-500" : "bg-gray-100 text-gray-500"
+                        }`}>
                         {reg.event?.status}
                       </span>
                     </div>
