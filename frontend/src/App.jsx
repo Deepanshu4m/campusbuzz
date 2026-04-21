@@ -11,24 +11,24 @@ import MyRegistrations from "./pages/MyRegistrations.jsx";
 import AdminDashboard from "./pages/AdminDashboard.jsx";
 import ClubAdminDashboard from "./pages/ClubAdminDashboard.jsx";
 import AttendancePage from "./pages/AttendancePage.jsx";
+import CreateEventPage from "./pages/CreateEventPage.jsx";
 
 function App() {
   return (
     <Provider store={store}>
       <BrowserRouter>
         <Routes>
-          {/* Public routes */}
           <Route path="/" element={<Hero />} />
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
 
-          {/* Protected routes */}
           <Route element={<ProtectedRoute />}>
             <Route path="/events" element={<EventsPage />} />
             <Route path="/my-registrations" element={<MyRegistrations />} />
             <Route path="/admin" element={<AdminDashboard />} />
             <Route path="/club-dashboard" element={<ClubAdminDashboard />} />
             <Route path="/attendance/:eventId" element={<AttendancePage />} />
+            <Route path="/create-event" element={<CreateEventPage />} />
           </Route>
 
           <Route path="*" element={<Navigate to="/" replace />} />

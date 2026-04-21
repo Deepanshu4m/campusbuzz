@@ -75,6 +75,8 @@ function MyRegistrations() {
       </div>
 
       <div className="max-w-2xl mx-auto px-6 py-8">
+
+        {/* ✅ UPDATED BADGE SECTION */}
         <div className="mb-8">
           <h2 className="text-xl font-semibold text-gray-900 mb-1">My Badges</h2>
           <p className="text-sm text-gray-400 mb-4">Earned by attending events</p>
@@ -85,22 +87,27 @@ function MyRegistrations() {
                 <div key={i} className="animate-pulse bg-gray-200 rounded-2xl h-24 w-28" />
               ))}
             </div>
-          ) : badges.length === 0 ? (
-            <div className="bg-white border border-dashed border-gray-200 rounded-2xl px-6 py-5 text-center">
-              <p className="text-sm text-gray-400">No badges yet — attend events to earn them!</p>
-            </div>
           ) : (
             <div className="flex flex-wrap gap-3">
-              {badges.map((badge) => {
-                const meta = BADGE_META[badge] || { label: badge, emoji: "🏅", desc: "" };
+              {Object.entries(BADGE_META).map(([key, meta]) => {
+                const earned = badges.includes(key);
                 return (
                   <div
-                    key={badge}
-                    className="bg-white border border-indigo-100 rounded-2xl px-4 py-3 flex flex-col items-center gap-1 shadow-sm min-w-[100px]"
+                    key={key}
+                    className={`rounded-2xl px-4 py-3 flex flex-col items-center gap-1 min-w-[100px] border transition-all ${
+                      earned
+                        ? "bg-white border-indigo-100 shadow-sm"
+                        : "bg-gray-50 border-gray-100 opacity-50 grayscale"
+                    }`}
                   >
                     <span className="text-2xl">{meta.emoji}</span>
                     <span className="text-xs font-semibold text-gray-800">{meta.label}</span>
                     <span className="text-xs text-gray-400 text-center">{meta.desc}</span>
+                    {earned && (
+                      <span className="text-[10px] text-indigo-500 font-semibold mt-0.5">
+                        ✓ Earned
+                      </span>
+                    )}
                   </div>
                 );
               })}
@@ -109,7 +116,7 @@ function MyRegistrations() {
         </div>
 
         <h2 className="text-xl font-semibold text-gray-900 mb-6">My Registrations</h2>
-        
+
         {loading ? (
           <div className="flex flex-col gap-4">
             {Array.from({ length: 3 }).map((_, i) => (
@@ -118,7 +125,9 @@ function MyRegistrations() {
           </div>
         ) : registrations.length === 0 ? (
           <div className="text-center py-16">
-            <p className="text-gray-400 text-sm mb-3">You haven't registered for any events yet.</p>
+            <p className="text-gray-400 text-sm mb-3">
+              You haven't registered for any events yet.
+            </p>
             <Link to="/events" className="text-indigo-500 text-sm font-medium hover:underline">
               Browse Events
             </Link>
@@ -134,12 +143,16 @@ function MyRegistrations() {
                       {formatDate(reg.event?.date)} · {reg.event?.venue}
                     </p>
                     <div className="flex items-center gap-2 mt-2">
-                      <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${reg.attended ? "bg-green-50 text-green-600" : "bg-yellow-50 text-yellow-600"
-                        }`}>
+                      <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${
+                        reg.attended ? "bg-green-50 text-green-600" : "bg-yellow-50 text-yellow-600"
+                      }`}>
                         {reg.attended ? "Attended ✓" : "Not attended yet"}
                       </span>
-                      <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${reg.event?.status === "upcoming" ? "bg-indigo-50 text-indigo-500" : "bg-gray-100 text-gray-500"
-                        }`}>
+                      <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${
+                        reg.event?.status === "upcoming"
+                          ? "bg-indigo-50 text-indigo-500"
+                          : "bg-gray-100 text-gray-500"
+                      }`}>
                         {reg.event?.status}
                       </span>
                     </div>
@@ -156,7 +169,9 @@ function MyRegistrations() {
                 {reg.attended && reg.event?.status === "completed" && (
                   <div className="mt-4 border-t border-gray-100 pt-4">
                     <button
-                      onClick={() => handleDownloadCertificate(reg._id, reg.event?.title)}
+                      onClick={() =>
+                        handleDownloadCertificate(reg._id, reg.event?.title)
+                      }
                       disabled={downloadingId === reg._id}
                       className="w-full flex items-center justify-center gap-2 bg-indigo-600 hover:bg-indigo-700 disabled:opacity-60 text-white text-sm font-medium py-2 rounded-xl transition-colors"
                     >
@@ -165,7 +180,9 @@ function MyRegistrations() {
                           <span className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
                           Generating...
                         </>
-                      ) : "Download Certificate"}
+                      ) : (
+                        "Download Certificate"
+                      )}
                     </button>
                   </div>
                 )}
