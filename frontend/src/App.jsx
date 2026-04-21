@@ -12,6 +12,7 @@ import AdminDashboard from "./pages/AdminDashboard.jsx";
 import ClubAdminDashboard from "./pages/ClubAdminDashboard.jsx";
 import AttendancePage from "./pages/AttendancePage.jsx";
 import CreateEventPage from "./pages/CreateEventPage.jsx";
+import EventDetailPage from "./pages/EventDetailPage.jsx";
 
 function App() {
   return (
@@ -29,6 +30,7 @@ function App() {
             <Route path="/club-dashboard" element={<ClubAdminDashboard />} />
             <Route path="/attendance/:eventId" element={<AttendancePage />} />
             <Route path="/create-event" element={<CreateEventPage />} />
+            <Route path="/events/:id" element={<EventDetailPage />} />
           </Route>
 
           <Route path="*" element={<Navigate to="/" replace />} />
