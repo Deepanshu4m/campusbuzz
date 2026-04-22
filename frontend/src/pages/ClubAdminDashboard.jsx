@@ -4,6 +4,28 @@ import { useNavigate, Link } from "react-router-dom";
 import api from "../utils/axios.js";
 import toast from "react-hot-toast";
 
+const confirmToast = (message, onConfirm) => {
+  toast((t) => (
+    <div className="flex flex-col gap-2">
+      <span className="text-sm">{message}</span>
+      <div className="flex gap-2">
+        <button
+          onClick={() => { toast.dismiss(t.id); onConfirm(); }}
+          className="px-3 py-1 bg-red-500 text-white text-xs rounded-lg font-medium"
+        >
+          Delete
+        </button>
+        <button
+          onClick={() => toast.dismiss(t.id)}
+          className="px-3 py-1 bg-gray-100 text-gray-600 text-xs rounded-lg font-medium"
+        >
+          Cancel
+        </button>
+      </div>
+    </div>
+  ), { duration: 8000 });
+};
+
 const CATEGORIES = ["General", "Technical", "Cultural", "Sports", "Workshop", "Hackathon", "Seminar"];
 
 const statusColor = (status) => {
@@ -101,19 +123,6 @@ export default function ClubAdminDashboard() {
     }
   };
 
-  const handleDelete = async (eventId, eventTitle) => {
-    if (!window.confirm(`Delete "${eventTitle}"? This cannot be undone.`)) return;
-    setDeletingId(eventId);
-    try {
-      await api.delete(`/events/${eventId}`);
-      toast.success("Event deleted");
-      setEvents((prev) => prev.filter((ev) => ev._id !== eventId));
-    } catch (err) {
-      toast.error(err.response?.data?.message || "Delete failed");
-    } finally {
-      setDeletingId(null);
-    }
-  };
 
   return (
     <div className="min-h-screen bg-gray-50">
