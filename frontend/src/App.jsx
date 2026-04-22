@@ -1,8 +1,10 @@
+import { useEffect } from "react";
 import { BrowserRouter, Routes, Route, Navigate, useLocation } from "react-router-dom";
-import { Provider } from "react-redux";
+import { Provider, useDispatch } from "react-redux";
 import { Toaster } from "react-hot-toast";
 import { AnimatePresence, motion } from "framer-motion";
 import { store } from "./redux/store.js";
+import { fetchCurrentUser } from "./redux/slices/authSlice.js";
 import ProtectedRoute from "./components/ProtectedRoute.jsx";
 import Hero from "./pages/Hero.jsx";
 import Login from "./pages/Login.jsx";
@@ -23,12 +25,7 @@ const pageVariants = {
 
 function PageWrapper({ children }) {
   return (
-    <motion.div
-      variants={pageVariants}
-      initial="initial"
-      animate="animate"
-      exit="exit"
-    >
+    <motion.div variants={pageVariants} initial="initial" animate="animate" exit="exit">
       {children}
     </motion.div>
   );
@@ -60,12 +57,25 @@ function AnimatedRoutes() {
   );
 }
 
+function AppInner() {
+  const dispatch = useDispatch();
+
+  useEffect(() => {
+    const token = localStorage.getItem("accessToken");
+    if (token) dispatch(fetchCurrentUser());
+  }, []);
+
+  return (
+    <BrowserRouter>
+      <AnimatedRoutes />
+    </BrowserRouter>
+  );
+}
+
 function App() {
   return (
     <Provider store={store}>
-      <BrowserRouter>
-        <AnimatedRoutes />
-      </BrowserRouter>
+      <AppInner />
       <Toaster
         position="top-right"
         toastOptions={{

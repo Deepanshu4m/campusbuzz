@@ -1,9 +1,12 @@
 import { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
+import { useDispatch } from "react-redux";
 import api from "../utils/axios.js";
+import { setCredentials } from "../redux/slices/authSlice.js";
 
 function Register() {
   const navigate = useNavigate();
+  const dispatch = useDispatch();
 
   const [form, setForm] = useState({
     name: "",
@@ -26,7 +29,12 @@ function Register() {
 
     try {
       await api.post("/auth/register", form);
-      navigate("/login?registered=true");
+      const loginRes = await api.post("/auth/login", {
+        email: form.email,
+        password: form.password,
+      });
+      dispatch(setCredentials(loginRes.data.data));
+      navigate("/events");
     } catch (err) {
       setError(err.response?.data?.message || "Registration failed");
     } finally {
