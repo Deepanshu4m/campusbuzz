@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import axiosInstance from "../utils/axios.js";
+import { TableRowSkeleton } from "../components/ui/Skeleton.jsx";
 
 const ROLES = ["student", "club_admin", "super_admin"];
 const STATUSES = ["upcoming", "ongoing", "completed", "cancelled"];
@@ -117,35 +118,33 @@ export default function AdminDashboard() {
 
         {activeTab === "users" && (
           <div className="bg-white rounded-2xl shadow overflow-hidden">
-            {loadingUsers ? (
-              <p className="p-6 text-gray-500">Loading users...</p>
-            ) : (
-              <table className="w-full text-sm">
-                <thead className="bg-indigo-50 text-indigo-700">
-                  <tr>
-                    <th className="text-left px-4 py-3">Name</th>
-                    <th className="text-left px-4 py-3">Email</th>
-                    <th className="text-left px-4 py-3">USN</th>
-                    <th className="text-left px-4 py-3">Role</th>
-                    <th className="text-left px-4 py-3">Change Role</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {users.map((u) => (
+            <table className="w-full text-sm">
+              <thead className="bg-indigo-50 text-indigo-700">
+                <tr>
+                  <th className="text-left px-4 py-3">Name</th>
+                  <th className="text-left px-4 py-3">Email</th>
+                  <th className="text-left px-4 py-3">USN</th>
+                  <th className="text-left px-4 py-3">Role</th>
+                  <th className="text-left px-4 py-3">Change Role</th>
+                </tr>
+              </thead>
+              <tbody>
+                {loadingUsers ? (
+                  Array.from({ length: 5 }).map((_, i) => <TableRowSkeleton key={i} />)
+                ) : (
+                  users.map((u) => (
                     <tr key={u._id} className="border-t hover:bg-gray-50">
                       <td className="px-4 py-3 font-medium">{u.name}</td>
                       <td className="px-4 py-3 text-gray-500">{u.email}</td>
                       <td className="px-4 py-3 text-gray-500">{u.usn || "—"}</td>
                       <td className="px-4 py-3">
-                        <span
-                          className={`px-2 py-1 rounded-full text-xs font-semibold ${
-                            u.role === "super_admin"
-                              ? "bg-red-100 text-red-600"
-                              : u.role === "club_admin"
-                              ? "bg-yellow-100 text-yellow-700"
-                              : "bg-green-100 text-green-700"
-                          }`}
-                        >
+                        <span className={`px-2 py-1 rounded-full text-xs font-semibold ${
+                          u.role === "super_admin"
+                            ? "bg-red-100 text-red-600"
+                            : u.role === "club_admin"
+                            ? "bg-yellow-100 text-yellow-700"
+                            : "bg-green-100 text-green-700"
+                        }`}>
                           {u.role}
                         </span>
                       </td>
@@ -157,46 +156,42 @@ export default function AdminDashboard() {
                           className="border border-gray-200 rounded-lg px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-300 disabled:opacity-50"
                         >
                           {ROLES.map((r) => (
-                            <option key={r} value={r}>
-                              {r}
-                            </option>
+                            <option key={r} value={r}>{r}</option>
                           ))}
                         </select>
                       </td>
                     </tr>
-                  ))}
-                </tbody>
-              </table>
-            )}
+                  ))
+                )}
+              </tbody>
+            </table>
           </div>
         )}
 
         {activeTab === "events" && (
           <div className="bg-white rounded-2xl shadow overflow-hidden">
-            {loadingEvents ? (
-              <p className="p-6 text-gray-500">Loading events...</p>
-            ) : (
-              <table className="w-full text-sm">
-                <thead className="bg-indigo-50 text-indigo-700">
-                  <tr>
-                    <th className="text-left px-4 py-3">Title</th>
-                    <th className="text-left px-4 py-3">Date</th>
-                    <th className="text-left px-4 py-3">Venue</th>
-                    <th className="text-left px-4 py-3">Created By</th>
-                    <th className="text-left px-4 py-3">Change Status</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {events.map((ev) => (
+            <table className="w-full text-sm">
+              <thead className="bg-indigo-50 text-indigo-700">
+                <tr>
+                  <th className="text-left px-4 py-3">Title</th>
+                  <th className="text-left px-4 py-3">Date</th>
+                  <th className="text-left px-4 py-3">Venue</th>
+                  <th className="text-left px-4 py-3">Created By</th>
+                  <th className="text-left px-4 py-3">Change Status</th>
+                </tr>
+              </thead>
+              <tbody>
+                {loadingEvents ? (
+                  Array.from({ length: 5 }).map((_, i) => <TableRowSkeleton key={i} />)
+                ) : (
+                  events.map((ev) => (
                     <tr key={ev._id} className="border-t hover:bg-gray-50">
                       <td className="px-4 py-3 font-medium">{ev.title}</td>
                       <td className="px-4 py-3 text-gray-500">
                         {new Date(ev.date).toLocaleDateString()}
                       </td>
                       <td className="px-4 py-3 text-gray-500">{ev.venue || "—"}</td>
-                      <td className="px-4 py-3 text-gray-500">
-                        {ev.createdBy?.name || "—"}
-                      </td>
+                      <td className="px-4 py-3 text-gray-500">{ev.createdBy?.name || "—"}</td>
                       <td className="px-4 py-3">
                         <select
                           value={ev.status || "upcoming"}
@@ -205,17 +200,15 @@ export default function AdminDashboard() {
                           className="border border-gray-200 rounded-lg px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-300 disabled:opacity-50"
                         >
                           {STATUSES.map((s) => (
-                            <option key={s} value={s}>
-                              {s}
-                            </option>
+                            <option key={s} value={s}>{s}</option>
                           ))}
                         </select>
                       </td>
                     </tr>
-                  ))}
-                </tbody>
-              </table>
-            )}
+                  ))
+                )}
+              </tbody>
+            </table>
           </div>
         )}
       </div>

@@ -3,6 +3,16 @@ import { useSelector } from "react-redux";
 import { useNavigate, Link } from "react-router-dom";
 import api from "../utils/axios.js";
 import toast from "react-hot-toast";
+import { AnalyticsRowSkeleton } from "../components/ui/Skeleton.jsx";
+
+const CATEGORIES = ["General", "Technical", "Cultural", "Sports", "Workshop", "Hackathon", "Seminar"];
+
+const statusColor = (status) => {
+  if (status === "completed") return "bg-gray-100 text-gray-600";
+  if (status === "ongoing") return "bg-blue-100 text-blue-600";
+  if (status === "cancelled") return "bg-red-100 text-red-500";
+  return "bg-green-100 text-green-700";
+};
 
 const confirmToast = (message, onConfirm) => {
   toast((t) => (
@@ -24,15 +34,6 @@ const confirmToast = (message, onConfirm) => {
       </div>
     </div>
   ), { duration: 8000 });
-};
-
-const CATEGORIES = ["General", "Technical", "Cultural", "Sports", "Workshop", "Hackathon", "Seminar"];
-
-const statusColor = (status) => {
-  if (status === "completed") return "bg-gray-100 text-gray-600";
-  if (status === "ongoing") return "bg-blue-100 text-blue-600";
-  if (status === "cancelled") return "bg-red-100 text-red-500";
-  return "bg-green-100 text-green-700";
 };
 
 export default function ClubAdminDashboard() {
@@ -123,6 +124,20 @@ export default function ClubAdminDashboard() {
     }
   };
 
+  const handleDelete = async (eventId, eventTitle) => {
+    confirmToast(`Delete "${eventTitle}"? This cannot be undone.`, async () => {
+      setDeletingId(eventId);
+      try {
+        await api.delete(`/events/${eventId}`);
+        toast.success("Event deleted");
+        setEvents((prev) => prev.filter((ev) => ev._id !== eventId));
+      } catch (err) {
+        toast.error(err.response?.data?.message || "Delete failed");
+      } finally {
+        setDeletingId(null);
+      }
+    });
+  };
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -140,7 +155,11 @@ export default function ClubAdminDashboard() {
         </div>
 
         {loading ? (
-          <p className="text-sm text-gray-400">Loading...</p>
+          <div className="flex flex-col gap-4">
+            {Array.from({ length: 3 }).map((_, i) => (
+              <AnalyticsRowSkeleton key={i} />
+            ))}
+          </div>
         ) : events.length === 0 ? (
           <div className="text-center py-16">
             <p className="text-gray-400 text-sm mb-3">You haven't created any events yet.</p>

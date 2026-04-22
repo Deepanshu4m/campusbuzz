@@ -1,6 +1,7 @@
-import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+import { BrowserRouter, Routes, Route, Navigate, useLocation } from "react-router-dom";
 import { Provider } from "react-redux";
 import { Toaster } from "react-hot-toast";
+import { AnimatePresence, motion } from "framer-motion";
 import { store } from "./redux/store.js";
 import ProtectedRoute from "./components/ProtectedRoute.jsx";
 import Hero from "./pages/Hero.jsx";
@@ -14,27 +15,56 @@ import AttendancePage from "./pages/AttendancePage.jsx";
 import CreateEventPage from "./pages/CreateEventPage.jsx";
 import EventDetailPage from "./pages/EventDetailPage.jsx";
 
+const pageVariants = {
+  initial: { opacity: 0, y: 16 },
+  animate: { opacity: 1, y: 0, transition: { duration: 0.3, ease: "easeOut" } },
+  exit: { opacity: 0, y: -8, transition: { duration: 0.2, ease: "easeIn" } },
+};
+
+function PageWrapper({ children }) {
+  return (
+    <motion.div
+      variants={pageVariants}
+      initial="initial"
+      animate="animate"
+      exit="exit"
+    >
+      {children}
+    </motion.div>
+  );
+}
+
+function AnimatedRoutes() {
+  const location = useLocation();
+
+  return (
+    <AnimatePresence mode="wait">
+      <Routes location={location} key={location.pathname}>
+        <Route path="/" element={<PageWrapper><Hero /></PageWrapper>} />
+        <Route path="/login" element={<PageWrapper><Login /></PageWrapper>} />
+        <Route path="/register" element={<PageWrapper><Register /></PageWrapper>} />
+
+        <Route element={<ProtectedRoute />}>
+          <Route path="/events" element={<PageWrapper><EventsPage /></PageWrapper>} />
+          <Route path="/my-registrations" element={<PageWrapper><MyRegistrations /></PageWrapper>} />
+          <Route path="/admin" element={<PageWrapper><AdminDashboard /></PageWrapper>} />
+          <Route path="/club-dashboard" element={<PageWrapper><ClubAdminDashboard /></PageWrapper>} />
+          <Route path="/attendance/:eventId" element={<PageWrapper><AttendancePage /></PageWrapper>} />
+          <Route path="/create-event" element={<PageWrapper><CreateEventPage /></PageWrapper>} />
+          <Route path="/events/:id" element={<PageWrapper><EventDetailPage /></PageWrapper>} />
+        </Route>
+
+        <Route path="*" element={<Navigate to="/" replace />} />
+      </Routes>
+    </AnimatePresence>
+  );
+}
+
 function App() {
   return (
     <Provider store={store}>
       <BrowserRouter>
-        <Routes>
-          <Route path="/" element={<Hero />} />
-          <Route path="/login" element={<Login />} />
-          <Route path="/register" element={<Register />} />
-
-          <Route element={<ProtectedRoute />}>
-            <Route path="/events" element={<EventsPage />} />
-            <Route path="/my-registrations" element={<MyRegistrations />} />
-            <Route path="/admin" element={<AdminDashboard />} />
-            <Route path="/club-dashboard" element={<ClubAdminDashboard />} />
-            <Route path="/attendance/:eventId" element={<AttendancePage />} />
-            <Route path="/create-event" element={<CreateEventPage />} />
-            <Route path="/events/:id" element={<EventDetailPage />} />
-          </Route>
-
-          <Route path="*" element={<Navigate to="/" replace />} />
-        </Routes>
+        <AnimatedRoutes />
       </BrowserRouter>
       <Toaster
         position="top-right"

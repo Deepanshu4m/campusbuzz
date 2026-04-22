@@ -26,6 +26,7 @@ function EventsPage() {
   const [loading, setLoading] = useState(true);
   const [registeringId, setRegisteringId] = useState(null);
   const [badgeCount, setBadgeCount] = useState(0);
+  const [menuOpen, setMenuOpen] = useState(false);
 
   useEffect(() => {
     fetchEvents();
@@ -85,58 +86,119 @@ function EventsPage() {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <div className="bg-white border-b border-gray-200 px-6 py-4 flex items-center justify-between">
-        <h1 className="text-lg font-semibold text-indigo-600">CampusBuzz</h1>
-
-        <div className="flex items-center gap-4">
-          <NotificationBell />
-          <span className="text-sm text-gray-500">Hi, {user?.name}</span>
-
-          <Link
-            to="/my-registrations"
-            className="relative text-sm text-indigo-500 hover:underline font-medium"
-          >
-            My Registrations
-            {badgeCount > 0 && (
-              <span className="absolute -top-2 -right-4 bg-indigo-600 text-white text-[10px] font-bold w-4 h-4 rounded-full flex items-center justify-center">
-                {badgeCount}
-              </span>
-            )}
-          </Link>
-
-          {(user?.role === "club_admin" || user?.role === "super_admin") && (
-            <>
-              <button
-                onClick={() => navigate("/create-event")}
-                className="px-4 py-2 bg-indigo-600 text-white rounded-lg text-sm hover:bg-indigo-700 transition font-medium"
-              >
-                + Create Event
-              </button>
-              <button
-                onClick={() => navigate("/club-dashboard")}
-                className="px-4 py-2 bg-indigo-50 border border-indigo-300 text-indigo-600 rounded-lg text-sm hover:bg-indigo-100 transition"
-              >
-                My Dashboard
-              </button>
-            </>
-          )}
-
-          {user?.role === "super_admin" && (
-            <button
-              onClick={() => navigate("/admin")}
-              className="px-4 py-2 bg-indigo-600 text-white rounded-lg text-sm hover:bg-indigo-700"
-            >
-              Admin Dashboard
-            </button>
-          )}
+      <div className="bg-white border-b border-gray-200 px-6 py-4">
+        <div className="flex items-center justify-between">
+          <h1 className="text-lg font-semibold text-indigo-600">CampusBuzz</h1>
 
           <button
-            onClick={handleLogout}
-            className="text-sm text-gray-500 hover:text-red-500 transition"
+            onClick={() => setMenuOpen((prev) => !prev)}
+            className="md:hidden flex flex-col gap-1.5 p-1"
           >
-            Logout
+            <span className={`block w-5 h-0.5 bg-gray-600 transition-transform duration-200 ${menuOpen ? "rotate-45 translate-y-2" : ""}`} />
+            <span className={`block w-5 h-0.5 bg-gray-600 transition-opacity duration-200 ${menuOpen ? "opacity-0" : ""}`} />
+            <span className={`block w-5 h-0.5 bg-gray-600 transition-transform duration-200 ${menuOpen ? "-rotate-45 -translate-y-2" : ""}`} />
           </button>
+
+          <div className="hidden md:flex items-center gap-4">
+            <NotificationBell />
+            <span className="text-sm text-gray-500">Hi, {user?.name}</span>
+
+            <Link
+              to="/my-registrations"
+              className="relative text-sm text-indigo-500 hover:underline font-medium"
+            >
+              My Registrations
+              {badgeCount > 0 && (
+                <span className="absolute -top-2 -right-4 bg-indigo-600 text-white text-[10px] font-bold w-4 h-4 rounded-full flex items-center justify-center">
+                  {badgeCount}
+                </span>
+              )}
+            </Link>
+
+            {(user?.role === "club_admin" || user?.role === "super_admin") && (
+              <>
+                <button
+                  onClick={() => navigate("/create-event")}
+                  className="px-4 py-2 bg-indigo-600 text-white rounded-lg text-sm hover:bg-indigo-700 transition font-medium"
+                >
+                  + Create Event
+                </button>
+                <button
+                  onClick={() => navigate("/club-dashboard")}
+                  className="px-4 py-2 bg-indigo-50 border border-indigo-300 text-indigo-600 rounded-lg text-sm hover:bg-indigo-100 transition"
+                >
+                  My Dashboard
+                </button>
+              </>
+            )}
+
+            {user?.role === "super_admin" && (
+              <button
+                onClick={() => navigate("/admin")}
+                className="px-4 py-2 bg-indigo-600 text-white rounded-lg text-sm hover:bg-indigo-700"
+              >
+                Admin Dashboard
+              </button>
+            )}
+
+            <button
+              onClick={handleLogout}
+              className="text-sm text-gray-500 hover:text-red-500 transition"
+            >
+              Logout
+            </button>
+          </div>
         </div>
+
+        {menuOpen && (
+          <div className="md:hidden mt-4 flex flex-col gap-3 pb-2 border-t border-gray-100 pt-4">
+            <div className="flex items-center justify-between">
+              <span className="text-sm text-gray-500">Hi, {user?.name}</span>
+              <NotificationBell />
+            </div>
+
+            <Link
+              to="/my-registrations"
+              onClick={() => setMenuOpen(false)}
+              className="text-sm text-indigo-500 font-medium"
+            >
+              My Registrations {badgeCount > 0 && `(${badgeCount})`}
+            </Link>
+
+            {(user?.role === "club_admin" || user?.role === "super_admin") && (
+              <>
+                <button
+                  onClick={() => { navigate("/create-event"); setMenuOpen(false); }}
+                  className="text-left text-sm text-indigo-600 font-medium"
+                >
+                  + Create Event
+                </button>
+                <button
+                  onClick={() => { navigate("/club-dashboard"); setMenuOpen(false); }}
+                  className="text-left text-sm text-indigo-600 font-medium"
+                >
+                  My Dashboard
+                </button>
+              </>
+            )}
+
+            {user?.role === "super_admin" && (
+              <button
+                onClick={() => { navigate("/admin"); setMenuOpen(false); }}
+                className="text-left text-sm text-indigo-600 font-medium"
+              >
+                Admin Dashboard
+              </button>
+            )}
+
+            <button
+              onClick={handleLogout}
+              className="text-left text-sm text-red-400 font-medium"
+            >
+              Logout
+            </button>
+          </div>
+        )}
       </div>
 
       <div className="max-w-5xl mx-auto px-6 py-8">

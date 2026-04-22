@@ -35,4 +35,35 @@ export const RegistrationCardSkeleton = () => (
   </div>
 );
 
+export const AnalyticsRowSkeleton = () => (
+  <div className="bg-white rounded-2xl border border-gray-200 shadow-sm p-5">
+    <div className="flex items-start justify-between gap-4">
+      <div className="flex-1 flex flex-col gap-2">
+        <Skeleton className="h-5 w-1/2" />
+        <Skeleton className="h-3 w-1/3" />
+      </div>
+      <div className="flex gap-2">
+        <Skeleton className="h-7 w-12 rounded-lg" />
+        <Skeleton className="h-7 w-14 rounded-lg" />
+        <Skeleton className="h-7 w-20 rounded-lg" />
+      </div>
+    </div>
+    <div className="mt-4 grid grid-cols-3 gap-3">
+      <Skeleton className="h-16 rounded-xl" />
+      <Skeleton className="h-16 rounded-xl" />
+      <Skeleton className="h-16 rounded-xl" />
+    </div>
+  </div>
+);
+
+export const TableRowSkeleton = () => (
+  <tr className="border-t">
+    <td className="px-4 py-3"><Skeleton className="h-4 w-24" /></td>
+    <td className="px-4 py-3"><Skeleton className="h-4 w-32" /></td>
+    <td className="px-4 py-3"><Skeleton className="h-4 w-20" /></td>
+    <td className="px-4 py-3"><Skeleton className="h-5 w-16 rounded-full" /></td>
+    <td className="px-4 py-3"><Skeleton className="h-7 w-24 rounded-lg" /></td>
+  </tr>
+);
+
 export default Skeleton;
