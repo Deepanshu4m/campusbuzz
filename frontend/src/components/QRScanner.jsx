@@ -67,7 +67,7 @@ function QRScanner({ eventId }) {
       {!scanning && !status && (
         <button
           onClick={startScanning}
-          className="px-6 py-2 bg-indigo-500 text-white rounded-lg hover:bg-indigo-600"
+          className="px-6 py-2 bg-indigo-500 text-white rounded-lg hover:bg-indigo-600 cursor-pointer"
         >
           Start Scanning
         </button>
@@ -80,7 +80,7 @@ function QRScanner({ eventId }) {
       {status && (
         <div className={`p-4 rounded-lg text-center w-full ${status.success ? "bg-green-50 text-green-700" : "bg-red-50 text-red-700"}`}>
           <p className="font-medium">{status.message}</p>
-          <button onClick={() => setStatus(null)} className="mt-2 text-sm underline">
+          <button onClick={() => setStatus(null)} className="mt-2 text-sm underline cursor-pointer">
             Scan another
           </button>
         </div>

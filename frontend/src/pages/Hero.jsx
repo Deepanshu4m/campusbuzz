@@ -18,7 +18,7 @@ function Hero() {
           {isAuthenticated ? (
             <button
               onClick={() => navigate("/events")}
-              className="px-4 py-2 bg-indigo-600 text-white text-sm font-medium rounded-lg hover:bg-indigo-700 transition"
+              className="px-4 py-2 bg-indigo-600 text-white text-sm font-medium rounded-lg hover:bg-indigo-700 transition cursor-pointer"
             >
               Go to Events
             </button>
@@ -26,13 +26,13 @@ function Hero() {
             <>
               <button
                 onClick={() => navigate("/login")}
-                className="px-4 py-2 text-sm text-gray-600 hover:text-indigo-600 font-medium transition"
+                className="px-4 py-2 text-sm text-gray-600 hover:text-indigo-600 font-medium transition cursor-pointer"
               >
                 Login
               </button>
               <button
                 onClick={() => navigate("/register")}
-                className="px-4 py-2 bg-indigo-600 text-white text-sm font-medium rounded-lg hover:bg-indigo-700 transition"
+                className="px-4 py-2 bg-indigo-600 text-white text-sm font-medium rounded-lg hover:bg-indigo-700 transition cursor-pointer"
               >
                 Sign up
               </button>
@@ -80,14 +80,14 @@ function Hero() {
         >
           <button
             onClick={handleCTA}
-            className="px-7 py-3 bg-indigo-600 text-white text-sm font-semibold rounded-xl hover:bg-indigo-700 transition shadow-md shadow-indigo-200"
+            className="px-7 py-3 bg-indigo-600 text-white text-sm font-semibold rounded-xl hover:bg-indigo-700 transition shadow-md shadow-indigo-200 cursor-pointer"
           >
             {isAuthenticated ? "Browse Events →" : "Get Started →"}
           </button>
           {!isAuthenticated && (
             <button
               onClick={() => navigate("/register")}
-              className="px-7 py-3 text-sm font-semibold text-gray-700 border border-gray-200 rounded-xl hover:border-indigo-300 hover:text-indigo-600 transition"
+              className="px-7 py-3 text-sm font-semibold text-gray-700 border border-gray-200 rounded-xl hover:border-indigo-300 hover:text-indigo-600 transition cursor-pointer"
             >
               Create account
             </button>

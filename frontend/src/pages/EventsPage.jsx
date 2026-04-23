@@ -119,7 +119,7 @@ function EventsPage() {
 
             <Link
               to="/my-registrations"
-              className="relative text-sm text-indigo-500 hover:underline font-medium"
+              className="relative text-sm text-indigo-500 hover:underline font-medium "
             >
               My Registrations
               {badgeCount > 0 && (
@@ -133,13 +133,13 @@ function EventsPage() {
               <>
                 <button
                   onClick={() => navigate("/create-event")}
-                  className="px-4 py-2 bg-indigo-600 text-white rounded-lg text-sm hover:bg-indigo-700 transition font-medium"
+                  className="px-4 py-2 bg-indigo-600 text-white rounded-lg text-sm hover:bg-indigo-700 transition font-medium cursor-pointer"
                 >
                   + Create Event
                 </button>
                 <button
                   onClick={() => navigate("/club-dashboard")}
-                  className="px-4 py-2 bg-indigo-50 border border-indigo-300 text-indigo-600 rounded-lg text-sm hover:bg-indigo-100 transition"
+                  className="px-4 py-2 bg-indigo-50 border border-indigo-300 text-indigo-600 rounded-lg text-sm hover:bg-indigo-100 transition cursor-pointer"
                 >
                   My Dashboard
                 </button>
@@ -149,7 +149,7 @@ function EventsPage() {
             {user?.role === "super_admin" && (
               <button
                 onClick={() => navigate("/admin")}
-                className="px-4 py-2 bg-indigo-600 text-white rounded-lg text-sm hover:bg-indigo-700"
+                className="px-4 py-2 bg-indigo-600 text-white rounded-lg text-sm hover:bg-indigo-700 cursor-pointer"
               >
                 Admin Dashboard
               </button>
@@ -157,7 +157,7 @@ function EventsPage() {
 
             <button
               onClick={handleLogout}
-              className="text-sm text-gray-500 hover:text-red-500 transition"
+              className="text-sm text-gray-500 hover:text-red-500 transition cursor-pointer"
             >
               Logout
             </button>
@@ -174,7 +174,7 @@ function EventsPage() {
             <Link
               to="/my-registrations"
               onClick={() => setMenuOpen(false)}
-              className="text-sm text-indigo-500 font-medium"
+              className="text-sm text-indigo-500 font-medium cursor-pointer"
             >
               My Registrations {badgeCount > 0 && `(${badgeCount})`}
             </Link>
@@ -183,13 +183,13 @@ function EventsPage() {
               <>
                 <button
                   onClick={() => { navigate("/create-event"); setMenuOpen(false); }}
-                  className="text-left text-sm text-indigo-600 font-medium"
+                  className="text-left text-sm text-indigo-600 font-medium cursor-pointer"
                 >
                   + Create Event
                 </button>
                 <button
                   onClick={() => { navigate("/club-dashboard"); setMenuOpen(false); }}
-                  className="text-left text-sm text-indigo-600 font-medium"
+                  className="text-left text-sm text-indigo-600 font-medium cursor-pointer"
                 >
                   My Dashboard
                 </button>
@@ -199,7 +199,7 @@ function EventsPage() {
             {user?.role === "super_admin" && (
               <button
                 onClick={() => { navigate("/admin"); setMenuOpen(false); }}
-                className="text-left text-sm text-indigo-600 font-medium"
+                className="text-left text-sm text-indigo-600 font-medium cursor-pointer"
               >
                 Admin Dashboard
               </button>
@@ -207,7 +207,7 @@ function EventsPage() {
 
             <button
               onClick={handleLogout}
-              className="text-left text-sm text-red-400 font-medium"
+              className="text-left text-sm text-red-400 font-medium cursor-pointer"
             >
               Logout
             </button>

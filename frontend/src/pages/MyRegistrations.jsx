@@ -18,7 +18,7 @@ const confirmToast = (message, onConfirm) => {
       <div className="flex gap-2">
         <button
           onClick={() => { toast.dismiss(t.id); onConfirm(); }}
-          className="px-3 py-1 bg-red-500 text-white text-xs rounded-lg font-medium"
+          className="px-3 py-1 bg-red-500 text-white text-xs rounded-lg font-medium cursor-pointer"
         >
           Cancel Registration
         </button>

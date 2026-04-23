@@ -171,7 +171,7 @@ export default function EventDetailPage() {
               <button
                 onClick={handleRegister}
                 disabled={registering || alreadyRegistered || isFull || isClosed}
-                className="w-full py-3 bg-indigo-600 hover:bg-indigo-700 disabled:opacity-50 text-white text-sm font-semibold rounded-xl transition"
+                className="w-full py-3 bg-indigo-600 hover:bg-indigo-700 disabled:opacity-50 text-white text-sm font-semibold rounded-xl transition cursor-pointer"
               >
                 {registering
                   ? "Registering..."

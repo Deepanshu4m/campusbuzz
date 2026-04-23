@@ -173,7 +173,7 @@ export default function CreateEventPage() {
           <button
             type="submit"
             disabled={loading}
-            className="w-full py-3 bg-indigo-600 hover:bg-indigo-700 disabled:opacity-50 text-white text-sm font-semibold rounded-xl transition mt-2"
+            className="w-full py-3 bg-indigo-600 hover:bg-indigo-700 disabled:opacity-50 text-white text-sm font-semibold rounded-xl transition mt-2 cursor-pointer"
           >
             {loading ? "Publishing..." : "Publish Event"}
           </button>

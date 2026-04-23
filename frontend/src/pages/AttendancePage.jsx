@@ -64,7 +64,7 @@ function AttendancePage() {
         <div className="flex gap-2 mb-6">
           <button
             onClick={() => setActiveTab("scan")}
-            className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
+            className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors cursor-pointer ${
               activeTab === "scan"
                 ? "bg-indigo-600 text-white"
                 : "bg-white border border-gray-200 text-gray-600 hover:border-indigo-400"
@@ -77,7 +77,7 @@ function AttendancePage() {
               setActiveTab("list");
               fetchAttendees();
             }}
-            className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
+            className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors cursor-pointer ${
               activeTab === "list"
                 ? "bg-indigo-600 text-white"
                 : "bg-white border border-gray-200 text-gray-600 hover:border-indigo-400"

@@ -185,20 +185,20 @@ export default function ClubAdminDashboard() {
                   <div className="flex items-center gap-2 shrink-0">
                     <button
                       onClick={() => openEdit(ev)}
-                      className="text-xs border border-gray-200 text-gray-600 px-3 py-1.5 rounded-lg hover:bg-gray-50 transition-colors font-medium"
+                      className="text-xs border border-gray-200 text-gray-600 px-3 py-1.5 rounded-lg hover:bg-gray-50 transition-colors font-medium cursor-pointer"
                     >
                       Edit
                     </button>
                     <button
                       onClick={() => handleDelete(ev._id, ev.title)}
                       disabled={deletingId === ev._id}
-                      className="text-xs border border-red-200 text-red-500 px-3 py-1.5 rounded-lg hover:bg-red-50 transition-colors font-medium disabled:opacity-50"
+                      className="text-xs border border-red-200 text-red-500 px-3 py-1.5 rounded-lg hover:bg-red-50 transition-colors font-medium disabled:opacity-50 cursor-pointer"
                     >
                       {deletingId === ev._id ? "Deleting..." : "Delete"}
                     </button>
                     <Link
                       to={`/attendance/${ev._id}`}
-                      className="text-xs border border-indigo-300 text-indigo-600 px-3 py-1.5 rounded-lg hover:bg-indigo-50 transition-colors font-medium"
+                      className="text-xs border border-indigo-300 text-indigo-600 px-3 py-1.5 rounded-lg hover:bg-indigo-50 transition-colors font-medium cursor-pointer"
                     >
                       Attendance
                     </Link>
