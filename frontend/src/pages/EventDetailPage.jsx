@@ -13,12 +13,18 @@ export default function EventDetailPage() {
   const [event, setEvent] = useState(null);
   const [loading, setLoading] = useState(true);
   const [registering, setRegistering] = useState(false);
+  const [alreadyRegistered, setAlreadyRegistered] = useState(false);
 
   useEffect(() => {
-    const fetchEvent = async () => {
+    const fetchAll = async () => {
       try {
-        const res = await api.get(`/events/${id}`);
-        setEvent(res.data.data);
+        const [eventRes, myRegsRes] = await Promise.all([
+          api.get(`/events/${id}`),
+          api.get("/registrations/my"),
+        ]);
+        setEvent(eventRes.data.data);
+        const registered = myRegsRes.data.data.some((r) => r.event._id === id);
+        setAlreadyRegistered(registered);
       } catch {
         toast.error("Event not found");
         navigate("/events");
@@ -26,7 +32,7 @@ export default function EventDetailPage() {
         setLoading(false);
       }
     };
-    fetchEvent();
+    fetchAll();
   }, [id]);
 
   const handleRegister = async () => {
@@ -34,6 +40,8 @@ export default function EventDetailPage() {
     try {
       await api.post(`/registrations/${id}/register`);
       toast.success("Registered! Check your email for the QR code.");
+      setAlreadyRegistered(true);
+      setEvent((prev) => ({ ...prev, registeredCount: prev.registeredCount + 1 }));
     } catch (err) {
       toast.error(err.response?.data?.message || "Registration failed");
     } finally {
@@ -95,11 +103,7 @@ export default function EventDetailPage() {
           className="bg-white rounded-2xl border border-gray-200 shadow-sm overflow-hidden"
         >
           {event.banner ? (
-            <img
-              src={event.banner}
-              alt={event.title}
-              className="w-full h-64 object-cover"
-            />
+            <img src={event.banner} alt={event.title} className="w-full h-64 object-cover" />
           ) : (
             <div className="w-full h-64 bg-indigo-50 flex items-center justify-center">
               <span className="text-indigo-200 text-sm">No banner</span>
@@ -166,18 +170,25 @@ export default function EventDetailPage() {
             <div className="border-t border-gray-100 pt-5">
               <button
                 onClick={handleRegister}
-                disabled={registering || isFull || isClosed}
+                disabled={registering || alreadyRegistered || isFull || isClosed}
                 className="w-full py-3 bg-indigo-600 hover:bg-indigo-700 disabled:opacity-50 text-white text-sm font-semibold rounded-xl transition"
               >
                 {registering
                   ? "Registering..."
+                  : alreadyRegistered
+                  ? "Already Registered ✓"
                   : isClosed
                   ? "Registrations Closed"
                   : isFull
                   ? "Event Full"
                   : "Register for this Event"}
               </button>
-              {isFull && (
+              {alreadyRegistered && (
+                <p className="text-xs text-center text-indigo-400 mt-2">
+                  You're registered. Check My Registrations for your QR code.
+                </p>
+              )}
+              {isFull && !alreadyRegistered && (
                 <p className="text-xs text-center text-red-400 mt-2">
                   This event has reached full capacity.
                 </p>

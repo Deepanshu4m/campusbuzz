@@ -64,11 +64,14 @@ const getMyEventsAnalytics = asyncHandler(async (req, res) => {
       return {
         _id: event._id,
         title: event.title,
+        description: event.description,
         date: event.date,
         venue: event.venue,
+        category: event.category,
         status: event.status,
         capacity: event.capacity,
         isOpen: event.isOpen,
+        banner: event.banner,
         totalRegistrations,
         totalAttended,
       };
