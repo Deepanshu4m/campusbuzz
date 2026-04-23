@@ -11,12 +11,35 @@ const BADGE_META = {
   enthusiast: { label: "Enthusiast", emoji: "🔥", desc: "Attended 5 events" },
 };
 
+const confirmToast = (message, onConfirm) => {
+  toast((t) => (
+    <div className="flex flex-col gap-2">
+      <span className="text-sm">{message}</span>
+      <div className="flex gap-2">
+        <button
+          onClick={() => { toast.dismiss(t.id); onConfirm(); }}
+          className="px-3 py-1 bg-red-500 text-white text-xs rounded-lg font-medium"
+        >
+          Cancel Registration
+        </button>
+        <button
+          onClick={() => toast.dismiss(t.id)}
+          className="px-3 py-1 bg-gray-100 text-gray-600 text-xs rounded-lg font-medium"
+        >
+          Keep
+        </button>
+      </div>
+    </div>
+  ), { duration: 8000 });
+};
+
 function MyRegistrations() {
   const [registrations, setRegistrations] = useState([]);
   const [badges, setBadges] = useState([]);
   const [loading, setLoading] = useState(true);
   const [expandedId, setExpandedId] = useState(null);
   const [downloadingId, setDownloadingId] = useState(null);
+  const [cancellingId, setCancellingId] = useState(null);
 
   useEffect(() => {
     fetchAll();
@@ -65,6 +88,21 @@ function MyRegistrations() {
     }
   };
 
+  const handleCancel = (eventId, eventTitle) => {
+    confirmToast(`Cancel registration for "${eventTitle}"?`, async () => {
+      setCancellingId(eventId);
+      try {
+        await api.delete(`/registrations/${eventId}/cancel`);
+        toast.success("Registration cancelled.");
+        setRegistrations((prev) => prev.filter((r) => r.event._id !== eventId));
+      } catch (err) {
+        toast.error(err.response?.data?.message || "Could not cancel registration.");
+      } finally {
+        setCancellingId(null);
+      }
+    });
+  };
+
   return (
     <div className="min-h-screen bg-gray-50">
       <div className="bg-white border-b border-gray-200 px-6 py-4 flex items-center justify-between">
@@ -75,8 +113,6 @@ function MyRegistrations() {
       </div>
 
       <div className="max-w-2xl mx-auto px-6 py-8">
-
-        {/* ✅ UPDATED BADGE SECTION */}
         <div className="mb-8">
           <h2 className="text-xl font-semibold text-gray-900 mb-1">My Badges</h2>
           <p className="text-sm text-gray-400 mb-4">Earned by attending events</p>
@@ -134,66 +170,79 @@ function MyRegistrations() {
           </div>
         ) : (
           <div className="flex flex-col gap-4">
-            {registrations.map((reg) => (
-              <div key={reg._id} className="bg-white rounded-2xl border border-gray-200 shadow-sm p-5">
-                <div className="flex items-start justify-between">
-                  <div>
-                    <h3 className="text-base font-semibold text-gray-900">{reg.event?.title}</h3>
-                    <p className="text-xs text-gray-500 mt-0.5">
-                      {formatDate(reg.event?.date)} · {reg.event?.venue}
-                    </p>
-                    <div className="flex items-center gap-2 mt-2">
-                      <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${
-                        reg.attended ? "bg-green-50 text-green-600" : "bg-yellow-50 text-yellow-600"
-                      }`}>
-                        {reg.attended ? "Attended ✓" : "Not attended yet"}
-                      </span>
-                      <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${
-                        reg.event?.status === "upcoming"
-                          ? "bg-indigo-50 text-indigo-500"
-                          : "bg-gray-100 text-gray-500"
-                      }`}>
-                        {reg.event?.status}
-                      </span>
+            {registrations.map((reg) => {
+              const canCancel = !reg.attended && reg.event?.status === "upcoming";
+              return (
+                <div key={reg._id} className="bg-white rounded-2xl border border-gray-200 shadow-sm p-5">
+                  <div className="flex items-start justify-between">
+                    <div>
+                      <h3 className="text-base font-semibold text-gray-900">{reg.event?.title}</h3>
+                      <p className="text-xs text-gray-500 mt-0.5">
+                        {formatDate(reg.event?.date)} · {reg.event?.venue}
+                      </p>
+                      <div className="flex items-center gap-2 mt-2">
+                        <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${
+                          reg.attended ? "bg-green-50 text-green-600" : "bg-yellow-50 text-yellow-600"
+                        }`}>
+                          {reg.attended ? "Attended ✓" : "Not attended yet"}
+                        </span>
+                        <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${
+                          reg.event?.status === "upcoming"
+                            ? "bg-indigo-50 text-indigo-500"
+                            : "bg-gray-100 text-gray-500"
+                        }`}>
+                          {reg.event?.status}
+                        </span>
+                      </div>
                     </div>
-                  </div>
 
-                  <button
-                    onClick={() => toggleQR(reg._id)}
-                    className="text-xs text-indigo-500 hover:underline font-medium shrink-0 ml-4"
-                  >
-                    {expandedId === reg._id ? "Hide QR" : "Show QR"}
-                  </button>
-                </div>
-
-                {reg.attended && reg.event?.status === "completed" && (
-                  <div className="mt-4 border-t border-gray-100 pt-4">
                     <button
-                      onClick={() =>
-                        handleDownloadCertificate(reg._id, reg.event?.title)
-                      }
-                      disabled={downloadingId === reg._id}
-                      className="w-full flex items-center justify-center gap-2 bg-indigo-600 hover:bg-indigo-700 disabled:opacity-60 text-white text-sm font-medium py-2 rounded-xl transition-colors"
+                      onClick={() => toggleQR(reg._id)}
+                      className="text-xs text-indigo-500 hover:underline font-medium shrink-0 ml-4"
                     >
-                      {downloadingId === reg._id ? (
-                        <>
-                          <span className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                          Generating...
-                        </>
-                      ) : (
-                        "Download Certificate"
-                      )}
+                      {expandedId === reg._id ? "Hide QR" : "Show QR"}
                     </button>
                   </div>
-                )}
 
-                {expandedId === reg._id && (
-                  <div className="mt-4 border-t border-gray-100 pt-4">
-                    <QRDisplay qrCode={reg.qrCode} eventTitle={reg.event?.title} />
-                  </div>
-                )}
-              </div>
-            ))}
+                  {canCancel && (
+                    <div className="mt-4 border-t border-gray-100 pt-4">
+                      <button
+                        onClick={() => handleCancel(reg.event._id, reg.event?.title)}
+                        disabled={cancellingId === reg.event._id}
+                        className="w-full flex items-center justify-center gap-2 border border-red-200 text-red-500 hover:bg-red-50 disabled:opacity-50 text-sm font-medium py-2 rounded-xl transition-colors"
+                      >
+                        {cancellingId === reg.event._id ? "Cancelling..." : "Cancel Registration"}
+                      </button>
+                    </div>
+                  )}
+
+                  {reg.attended && reg.event?.status === "completed" && (
+                    <div className="mt-4 border-t border-gray-100 pt-4">
+                      <button
+                        onClick={() => handleDownloadCertificate(reg._id, reg.event?.title)}
+                        disabled={downloadingId === reg._id}
+                        className="w-full flex items-center justify-center gap-2 bg-indigo-600 hover:bg-indigo-700 disabled:opacity-60 text-white text-sm font-medium py-2 rounded-xl transition-colors"
+                      >
+                        {downloadingId === reg._id ? (
+                          <>
+                            <span className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                            Generating...
+                          </>
+                        ) : (
+                          "Download Certificate"
+                        )}
+                      </button>
+                    </div>
+                  )}
+
+                  {expandedId === reg._id && (
+                    <div className="mt-4 border-t border-gray-100 pt-4">
+                      <QRDisplay qrCode={reg.qrCode} eventTitle={reg.event?.title} />
+                    </div>
+                  )}
+                </div>
+              );
+            })}
           </div>
         )}
       </div>
