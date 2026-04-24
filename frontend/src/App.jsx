@@ -16,6 +16,7 @@ import ClubAdminDashboard from "./pages/ClubAdminDashboard.jsx";
 import AttendancePage from "./pages/AttendancePage.jsx";
 import CreateEventPage from "./pages/CreateEventPage.jsx";
 import EventDetailPage from "./pages/EventDetailPage.jsx";
+import NotFound from "./pages/NotFound.jsx";
 
 const pageVariants = {
   initial: { opacity: 0, y: 16 },
@@ -51,7 +52,7 @@ function AnimatedRoutes() {
           <Route path="/events/:id" element={<PageWrapper><EventDetailPage /></PageWrapper>} />
         </Route>
 
-        <Route path="*" element={<Navigate to="/" replace />} />
+        <Route path="*" element={<PageWrapper><NotFound /></PageWrapper>} />
       </Routes>
     </AnimatePresence>
   );
