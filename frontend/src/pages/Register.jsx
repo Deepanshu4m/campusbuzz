@@ -1,190 +1,280 @@
-import { useSelector } from "react-redux";
-import { useNavigate } from "react-router-dom";
-import { motion } from "framer-motion";
+import { useState } from "react";
+import { useDispatch } from "react-redux";
+import { useNavigate, Link } from "react-router-dom";
+import { setCredentials } from "../redux/slices/authSlice.js";
+import api from "../utils/axios.js";
 
-const FEATURES = [
-  "QR-based check-in",
-  "Role-based dashboards",
-  "PDF certificates",
-  "Real-time notifications",
-  "Multi-club support",
+const DEPARTMENTS = [
+  "Computer Science",
+  "Information Science",
+  "Electronics & Communication",
+  "Electrical Engineering",
+  "Mechanical Engineering",
+  "Civil Engineering",
+  "Artificial Intelligence & ML",
+  "Other",
 ];
 
-const STATS = [
-  { value: "12", label: "Active clubs" },
-  { value: "200", label: "Students registered" },
-  { value: "50", label: "Events hosted" },
-];
-
-const fadeUp = (delay = 0) => ({
-  initial: { opacity: 0, y: 24 },
-  animate: { opacity: 1, y: 0 },
-  transition: { duration: 0.6, delay, ease: [0.22, 1, 0.36, 1] },
-});
-
-function Hero() {
+function Register() {
+  const dispatch = useDispatch();
   const navigate = useNavigate();
-  const isAuthenticated = useSelector((state) => state.auth.isAuthenticated);
+  const [form, setForm] = useState({
+    name: "",
+    email: "",
+    password: "",
+    usn: "",
+    department: "Computer Science",
+  });
+  const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
+
+  const handleChange = (e) => setForm({ ...form, [e.target.name]: e.target.value });
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setLoading(true);
+    setError("");
+    try {
+      const loginRes = await api.post("/auth/register", form);
+      const loginResponse = await api.post("/auth/login", {
+        email: form.email,
+        password: form.password,
+      });
+      dispatch(setCredentials(loginResponse.data.data));
+      navigate("/events");
+    } catch (err) {
+      setError(err.response?.data?.message || "Registration failed");
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
-    <div className="min-h-screen flex flex-col" style={{ backgroundColor: "#f5f4f0", fontFamily: "'DM Sans', sans-serif" }}>
-      <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;1,9..40,300&family=DM+Serif+Display:ital@0;1&display=swap" rel="stylesheet" />
+    <div
+      className="min-h-screen flex flex-col"
+      style={{ backgroundColor: "#f5f4f0", fontFamily: "'DM Sans', sans-serif" }}
+    >
+      <link
+        href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500&family=DM+Serif+Display:ital@0;1&display=swap"
+        rel="stylesheet"
+      />
 
-      <nav className="flex items-center justify-between px-10 py-6">
-        <span style={{ fontFamily: "'DM Serif Display', serif", fontSize: "1.25rem", color: "#111", letterSpacing: "-0.01em" }}>
+      <nav
+        className="flex items-center justify-between px-10 py-5 bg-white"
+        style={{ borderBottom: "1px solid #e0dfd9" }}
+      >
+        <span
+          style={{
+            fontFamily: "'DM Serif Display', serif",
+            fontSize: "1.2rem",
+            color: "#111",
+            letterSpacing: "-0.01em",
+          }}
+        >
           CampusBuzz
         </span>
-
-        <div className="flex items-center gap-2">
-          {isAuthenticated ? (
-            <button
-              onClick={() => navigate("/events")}
-              className="text-sm px-5 py-2 rounded-full cursor-pointer border-none"
-              style={{ backgroundColor: "#111", color: "#f5f4f0", fontFamily: "'DM Sans', sans-serif", letterSpacing: "0.01em" }}
-            >
-              Go to Events
-            </button>
-          ) : (
-            <>
-              <button
-                onClick={() => navigate("/login")}
-                className="text-sm px-5 py-2 rounded-full cursor-pointer"
-                style={{ color: "#555", backgroundColor: "transparent", border: "1px solid #d0cfc9", fontFamily: "'DM Sans', sans-serif", letterSpacing: "0.01em" }}
-              >
-                Login
-              </button>
-              <button
-                onClick={() => navigate("/register")}
-                className="text-sm font-medium px-5 py-2 rounded-full cursor-pointer border-none"
-                style={{ backgroundColor: "#111", color: "#f5f4f0", fontFamily: "'DM Sans', sans-serif", letterSpacing: "0.01em" }}
-              >
-                Sign up
-              </button>
-            </>
-          )}
-        </div>
+        <Link to="/" className="text-sm" style={{ color: "#888" }}>
+          ← Home
+        </Link>
       </nav>
 
-      <div className="mx-10" style={{ height: "1px", backgroundColor: "#e0dfd9" }} />
+      <div className="flex-1 flex items-center justify-center px-4 py-10">
+        <div className="w-full max-w-md">
 
-      <main className="flex-1 flex flex-col items-center justify-center text-center px-6 py-24">
-
-        <motion.p
-          {...fadeUp(0)}
-          className="text-xs font-medium uppercase mb-8"
-          style={{ letterSpacing: "0.18em", color: "#888" }}
-        >
-          NMIT · Campus Event Platform
-        </motion.p>
-
-        <motion.h1
-          {...fadeUp(0.1)}
-          className="font-normal"
-          style={{
-            fontFamily: "'DM Serif Display', serif",
-            fontSize: "clamp(3.2rem, 7vw, 6.5rem)",
-            lineHeight: 1.05,
-            color: "#111",
-            letterSpacing: "-0.03em",
-            maxWidth: "800px",
-            marginBottom: "0.4rem",
-          }}
-        >
-          Campus events,
-        </motion.h1>
-
-        <motion.h1
-          {...fadeUp(0.18)}
-          className="font-normal"
-          style={{
-            fontFamily: "'DM Serif Display', serif",
-            fontStyle: "italic",
-            fontSize: "clamp(3.2rem, 7vw, 6.5rem)",
-            lineHeight: 1.05,
-            color: "#888",
-            letterSpacing: "-0.03em",
-            maxWidth: "800px",
-            marginBottom: "2.5rem",
-          }}
-        >
-          all in one place.
-        </motion.h1>
-
-        <motion.p
-          {...fadeUp(0.26)}
-          className="text-sm mb-10"
-          style={{ color: "#666", fontWeight: 300, maxWidth: "420px", lineHeight: 1.75 }}
-        >
-          Discover, register, and attend events across all clubs at NMIT.
-          QR-based entry, live attendance, and digital certificates — built for you.
-        </motion.p>
-
-        <motion.div {...fadeUp(0.34)} className="flex items-center gap-3">
-          <button
-            onClick={() => navigate(isAuthenticated ? "/events" : "/register")}
-            className="text-sm font-medium px-7 py-3 rounded-full cursor-pointer border-none"
-            style={{ backgroundColor: "#111", color: "#f5f4f0", fontFamily: "'DM Sans', sans-serif", letterSpacing: "0.01em" }}
+          <p
+            className="text-xs font-medium uppercase mb-4"
+            style={{ letterSpacing: "0.16em", color: "#888" }}
           >
-            {isAuthenticated ? "Browse Events" : "Get Started →"}
-          </button>
+            NMIT · Campus Platform
+          </p>
 
-          {!isAuthenticated && (
-            <button
-              onClick={() => navigate("/events")}
-              className="text-sm px-7 py-3 rounded-full cursor-pointer"
-              style={{ color: "#333", backgroundColor: "transparent", border: "1px solid #c8c7c1", fontFamily: "'DM Sans', sans-serif", letterSpacing: "0.01em" }}
-            >
-              Browse Events
-            </button>
-          )}
-        </motion.div>
+          <h1
+            className="mb-2"
+            style={{
+              fontFamily: "'DM Serif Display', serif",
+              fontSize: "2.4rem",
+              fontWeight: 400,
+              color: "#111",
+              letterSpacing: "-0.03em",
+              lineHeight: 1.1,
+            }}
+          >
+            Create your
+            <br />
+            <span style={{ fontStyle: "italic", color: "#888" }}>account.</span>
+          </h1>
 
-        <motion.div
-          {...fadeUp(0.44)}
-          className="flex flex-wrap justify-center gap-2 mt-14"
-        >
-          {FEATURES.map((feat) => (
-            <span
-              key={feat}
-              className="text-xs px-4 py-1.5 rounded-full"
-              style={{ color: "#777", backgroundColor: "#eceae4", border: "1px solid #dddbd5", letterSpacing: "0.01em" }}
-            >
-              {feat}
-            </span>
-          ))}
-        </motion.div>
+          <p className="text-sm mb-8" style={{ color: "#888", fontWeight: 300 }}>
+            Join CampusBuzz to discover and register for events
+          </p>
 
-        <motion.div
-          {...fadeUp(0.54)}
-          className="grid grid-cols-3 w-full mt-20"
-          style={{ maxWidth: "560px", borderTop: "1px solid #dddbd5", borderBottom: "1px solid #dddbd5" }}
-        >
-          {STATS.map((stat, i) => (
+          {error && (
             <div
-              key={stat.label}
-              className="flex flex-col items-center py-8"
-              style={{ borderRight: i < STATS.length - 1 ? "1px solid #dddbd5" : "none" }}
+              className="mb-5 text-sm px-4 py-3 rounded-xl"
+              style={{
+                backgroundColor: "#fdf0eb",
+                border: "1px solid #f0c0b0",
+                color: "#a04020",
+              }}
             >
-              <span
-                className="font-normal leading-none"
-                style={{ fontFamily: "'DM Serif Display', serif", fontSize: "2.6rem", color: "#111", letterSpacing: "-0.03em" }}
-              >
-                {stat.value}
-                <span style={{ color: "#aaa", fontSize: "2rem" }}>+</span>
-              </span>
-              <span
-                className="text-xs mt-1.5"
-                style={{ color: "#888", letterSpacing: "0.02em" }}
-              >
-                {stat.label}
-              </span>
+              {error}
             </div>
-          ))}
-        </motion.div>
+          )}
 
-      </main>
+          <form onSubmit={handleSubmit} className="flex flex-col gap-5">
+            <div>
+              <label
+                className="block text-xs font-medium uppercase mb-2"
+                style={{ letterSpacing: "0.04em", color: "#555" }}
+              >
+                Full Name
+              </label>
+              <input
+                type="text"
+                name="name"
+                value={form.name}
+                onChange={handleChange}
+                placeholder="e.g. Deepanshu Bisht"
+                required
+                className="w-full px-4 py-3 text-sm rounded-xl outline-none"
+                style={{
+                  border: "1px solid #d0cfc9",
+                  backgroundColor: "#faf9f6",
+                  color: "#111",
+                  fontFamily: "'DM Sans', sans-serif",
+                }}
+              />
+            </div>
+
+            <div>
+              <label
+                className="block text-xs font-medium uppercase mb-2"
+                style={{ letterSpacing: "0.04em", color: "#555" }}
+              >
+                Email
+              </label>
+              <input
+                type="email"
+                name="email"
+                value={form.email}
+                onChange={handleChange}
+                placeholder="you@nmit.ac.in"
+                required
+                className="w-full px-4 py-3 text-sm rounded-xl outline-none"
+                style={{
+                  border: "1px solid #d0cfc9",
+                  backgroundColor: "#faf9f6",
+                  color: "#111",
+                  fontFamily: "'DM Sans', sans-serif",
+                }}
+              />
+            </div>
+
+            <div>
+              <label
+                className="block text-xs font-medium uppercase mb-2"
+                style={{ letterSpacing: "0.04em", color: "#555" }}
+              >
+                Password
+              </label>
+              <input
+                type="password"
+                name="password"
+                value={form.password}
+                onChange={handleChange}
+                placeholder="••••••••"
+                required
+                className="w-full px-4 py-3 text-sm rounded-xl outline-none"
+                style={{
+                  border: "1px solid #d0cfc9",
+                  backgroundColor: "#faf9f6",
+                  color: "#111",
+                  fontFamily: "'DM Sans', sans-serif",
+                }}
+              />
+            </div>
+
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <label
+                  className="block text-xs font-medium uppercase mb-2"
+                  style={{ letterSpacing: "0.04em", color: "#555" }}
+                >
+                  USN
+                </label>
+                <input
+                  type="text"
+                  name="usn"
+                  value={form.usn}
+                  onChange={handleChange}
+                  placeholder="1NT23CS056"
+                  className="w-full px-4 py-3 text-sm rounded-xl outline-none"
+                  style={{
+                    border: "1px solid #d0cfc9",
+                    backgroundColor: "#faf9f6",
+                    color: "#111",
+                    fontFamily: "'DM Sans', sans-serif",
+                  }}
+                />
+              </div>
+
+              <div>
+                <label
+                  className="block text-xs font-medium uppercase mb-2"
+                  style={{ letterSpacing: "0.04em", color: "#555" }}
+                >
+                  Department
+                </label>
+                <select
+                  name="department"
+                  value={form.department}
+                  onChange={handleChange}
+                  className="w-full px-4 py-3 text-sm rounded-xl outline-none cursor-pointer"
+                  style={{
+                    border: "1px solid #d0cfc9",
+                    backgroundColor: "#faf9f6",
+                    color: "#111",
+                    fontFamily: "'DM Sans', sans-serif",
+                    appearance: "none",
+                  }}
+                >
+                  {DEPARTMENTS.map((d) => (
+                    <option key={d} value={d}>
+                      {d}
+                    </option>
+                  ))}
+                </select>
+              </div>
+            </div>
+
+            <button
+              type="submit"
+              disabled={loading}
+              className="w-full py-3 text-sm font-medium rounded-full transition disabled:opacity-50 cursor-pointer mt-1"
+              style={{
+                backgroundColor: "#111",
+                color: "#f5f4f0",
+                letterSpacing: "0.01em",
+                fontFamily: "'DM Sans', sans-serif",
+              }}
+            >
+              {loading ? "Creating account..." : "Create Account →"}
+            </button>
+          </form>
+
+          <div className="my-7" style={{ height: "1px", backgroundColor: "#e0dfd9" }} />
+
+          <p className="text-sm text-center" style={{ color: "#888" }}>
+            Already have an account?{" "}
+            <Link to="/login" className="font-medium" style={{ color: "#111" }}>
+              Sign in
+            </Link>
+          </p>
+
+        </div>
+      </div>
     </div>
   );
 }
 
-export default Hero;
+export default Register;
