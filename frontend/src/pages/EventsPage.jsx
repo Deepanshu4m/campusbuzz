@@ -28,21 +28,28 @@ function EventsPage() {
   const [registeringId, setRegisteringId] = useState(null);
   const [badgeCount, setBadgeCount] = useState(0);
   const [menuOpen, setMenuOpen] = useState(false);
+  const [activeCategory, setActiveCategory] = useState("");
+  const [activeStatus, setActiveStatus] = useState("");
 
-  useEffect(() => { fetchAll(); }, []);
+  useEffect(() => { fetchAll(activeCategory, activeStatus); }, [activeCategory, activeStatus]);
 
   useEffect(() => {
     if (user) {
       api.get("/auth/me/badges")
         .then((res) => setBadgeCount(res.data.data.badges.length))
-        .catch(() => {});
+        .catch(() => { });
     }
   }, [user]);
 
-  const fetchAll = async () => {
+  const fetchAll = async (category = "", status = "") => {
+    setLoading(true);
     try {
+      const params = new URLSearchParams();
+      if (category) params.append("category", category);
+      if (status) params.append("status", status);
+
       const [eventsRes, myRegsRes] = await Promise.all([
-        api.get("/events"),
+        api.get(`/events?${params.toString()}`),
         api.get("/registrations/my"),
       ]);
       setEvents(eventsRes.data.data.events);
@@ -181,9 +188,45 @@ function EventsPage() {
         <h2 className="font-normal mb-1" style={{ fontFamily: "'DM Serif Display', serif", fontSize: "2rem", color: "#111", letterSpacing: "-0.03em" }}>
           Upcoming Events
         </h2>
-        <p className="text-sm mb-8" style={{ color: "#999", fontWeight: 300 }}>
+        <p className="text-sm mb-6" style={{ color: "#999", fontWeight: 300 }}>
           Discover and register for events across all clubs at NMIT
         </p>
+
+        <div className="flex flex-col gap-3 mb-8">
+          <div className="flex flex-wrap gap-2">
+            {["", "General", "Technical", "Cultural", "Sports", "Workshop", "Hackathon", "Seminar"].map((cat) => (
+              <button
+                key={cat || "all-cat"}
+                onClick={() => setActiveCategory(cat)}
+                className="text-xs px-4 py-1.5 rounded-full cursor-pointer transition"
+                style={
+                  activeCategory === cat
+                    ? { backgroundColor: "#111", color: "#f5f4f0", border: "none", fontFamily: "'DM Sans', sans-serif" }
+                    : { backgroundColor: "transparent", color: "#666", border: "1px solid #d0cfc9", fontFamily: "'DM Sans', sans-serif" }
+                }
+              >
+                {cat || "All Categories"}
+              </button>
+            ))}
+          </div>
+
+          <div className="flex flex-wrap gap-2">
+            {["", "upcoming", "ongoing", "completed", "cancelled"].map((st) => (
+              <button
+                key={st || "all-status"}
+                onClick={() => setActiveStatus(st)}
+                className="text-xs px-4 py-1.5 rounded-full cursor-pointer transition"
+                style={
+                  activeStatus === st
+                    ? { backgroundColor: "#111", color: "#f5f4f0", border: "none", fontFamily: "'DM Sans', sans-serif" }
+                    : { backgroundColor: "transparent", color: "#666", border: "1px solid #d0cfc9", fontFamily: "'DM Sans', sans-serif" }
+                }
+              >
+                {st || "All Statuses"}
+              </button>
+            ))}
+          </div>
+        </div>
 
         {loading ? (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">

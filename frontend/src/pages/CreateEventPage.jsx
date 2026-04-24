@@ -118,7 +118,7 @@ export default function CreateEventPage() {
             <label className="block text-xs font-medium uppercase mb-2" style={{ color: "#555", letterSpacing: "0.04em" }}>Banner Image</label>
             <input type="file" accept="image/*" onChange={handleBanner} className="text-sm" style={{ color: "#666" }} />
             {preview ? (
-              <img src={preview} alt="preview" className="w-full h-44 object-cover rounded-xl mt-3" />
+              <img src={preview} alt="preview" className="w-full h-44 object-cover rounded-xl mt-3 cursor-pointer" />
             ) : (
               <div className="w-full h-44 rounded-xl flex items-center justify-center mt-3" style={{ backgroundColor: "#f0ede6" }}>
                 <span className="text-xs uppercase tracking-widest" style={{ color: "#ccc" }}>No image selected</span>

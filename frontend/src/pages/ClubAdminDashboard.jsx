@@ -129,9 +129,30 @@ export default function ClubAdminDashboard() {
       }
     });
   };
+  const handleExportCSV = () => {
+    const headers = ["Title", "Category", "Date", "Status", "Capacity", "Registered", "Attended"];
+    const rows = events.map((ev) => [
+      `"${ev.title}"`,
+      ev.category,
+      formatDate(ev.date),
+      ev.status,
+      ev.capacity,
+      ev.totalRegistrations || 0,
+      ev.totalAttended || 0,
+    ]);
 
-  const totalRegistrations = events.reduce((sum, ev) => sum + (ev.registeredCount || 0), 0);
-  const totalAttendees = events.reduce((sum, ev) => sum + (ev.attendedCount || 0), 0);
+    const csv = [headers, ...rows].map((r) => r.join(",")).join("\n");
+    const blob = new Blob([csv], { type: "text/csv" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `campusbuzz-events-${new Date().toISOString().slice(0, 10)}.csv`;
+    a.click();
+    URL.revokeObjectURL(url);
+  };
+
+  const totalRegistrations = events.reduce((sum, ev) => sum + (ev.totalRegistrations || 0), 0);
+  const totalAttendees = events.reduce((sum, ev) => sum + (ev.totalAttended || 0), 0);
 
   return (
     <div className="min-h-screen" style={{ backgroundColor: "#f5f4f0", fontFamily: "'DM Sans', sans-serif" }}>
@@ -141,7 +162,16 @@ export default function ClubAdminDashboard() {
         <Link to="/" style={{ fontFamily: "'DM Serif Display', serif", fontSize: "1.2rem", color: "#111", letterSpacing: "-0.01em", textDecoration: "none" }}>
           CampusBuzz
         </Link>
-        <div className="flex items-center gap-4">
+        <div className="flex items-center gap-3">
+          {events.length > 0 && (
+            <button
+              onClick={handleExportCSV}
+              className="text-sm px-5 py-2 rounded-full cursor-pointer"
+              style={{ backgroundColor: "transparent", color: "#555", border: "1px solid #d0cfc9", fontFamily: "'DM Sans', sans-serif" }}
+            >
+              Export CSV
+            </button>
+          )}
           <button
             onClick={() => navigate("/create-event")}
             className="text-sm font-medium px-5 py-2 rounded-full border-none cursor-pointer"
@@ -159,7 +189,7 @@ export default function ClubAdminDashboard() {
         </h1>
         <p className="text-sm mb-8" style={{ color: "#999", fontWeight: 300 }}>Manage your events and track performance</p>
 
-        <div className="grid grid-cols-3 gap-4 mb-8">
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-8">
           {[
             { value: events.length, label: "Events created" },
             { value: totalRegistrations, label: "Total registrations" },
@@ -193,52 +223,96 @@ export default function ClubAdminDashboard() {
             </button>
           </div>
         ) : (
-          <div className="bg-white rounded-2xl overflow-hidden" style={{ border: "1px solid #e8e6e0" }}>
-            <table className="w-full">
-              <thead>
-                <tr style={{ borderBottom: "1px solid #f0ede6" }}>
-                  {["Event", "Date", "Status", "Registered", "Attended", "Actions"].map((h) => (
-                    <th key={h} className="text-left text-xs font-semibold uppercase tracking-wide px-5 py-4" style={{ color: "#aaa", letterSpacing: "0.08em" }}>
-                      {h}
-                    </th>
-                  ))}
-                </tr>
-              </thead>
-              <tbody>
-                {events.map((ev) => (
-                  <tr key={ev._id} className="hover:bg-gray-50 transition" style={{ borderBottom: "1px solid #f8f7f3" }}>
-                    <td className="px-5 py-4">
-                      <p className="text-sm font-semibold" style={{ color: "#111" }}>{ev.title}</p>
-                      <p className="text-xs mt-0.5" style={{ color: "#aaa" }}>{ev.category}</p>
-                    </td>
-                    <td className="px-5 py-4 text-sm" style={{ color: "#666" }}>{formatDate(ev.date)}</td>
-                    <td className="px-5 py-4">
-                      <span className={`text-xs font-semibold px-2.5 py-0.5 rounded-full ${statusClass(ev.status)}`}>{ev.status}</span>
-                    </td>
-                    <td className="px-5 py-4 text-sm">
-                      <span className="font-semibold" style={{ color: "#111" }}>{ev.registeredCount}</span>
-                      <span style={{ color: "#aaa" }}> / {ev.capacity}</span>
-                    </td>
-                    <td className="px-5 py-4 text-sm font-semibold" style={{ color: "#111" }}>{ev.attendedCount || 0}</td>
-                    <td className="px-5 py-4">
-                      <div className="flex gap-4">
-                        <Link to={`/attendance/${ev._id}`} className="text-xs font-medium" style={{ color: "#6366f1", textDecoration: "none" }}>Attendance</Link>
-                        <button onClick={() => openEdit(ev)} className="text-xs font-medium bg-transparent border-none cursor-pointer" style={{ color: "#555", fontFamily: "'DM Sans', sans-serif" }}>Edit</button>
-                        <button
-                          onClick={() => handleDelete(ev._id, ev.title)}
-                          disabled={deletingId === ev._id}
-                          className="text-xs font-medium bg-transparent border-none cursor-pointer disabled:opacity-50"
-                          style={{ color: "#ef4444", fontFamily: "'DM Sans', sans-serif" }}
-                        >
-                          {deletingId === ev._id ? "Deleting..." : "Delete"}
-                        </button>
-                      </div>
-                    </td>
+          <>
+            <div className="hidden md:block bg-white rounded-2xl overflow-hidden" style={{ border: "1px solid #e8e6e0" }}>
+              <table className="w-full">
+                <thead>
+                  <tr style={{ borderBottom: "1px solid #f0ede6" }}>
+                    {["Event", "Date", "Status", "Registered", "Attended", "Actions"].map((h) => (
+                      <th key={h} className="text-left text-xs font-semibold uppercase tracking-wide px-5 py-4" style={{ color: "#aaa", letterSpacing: "0.08em" }}>
+                        {h}
+                      </th>
+                    ))}
                   </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
+                </thead>
+                <tbody>
+                  {events.map((ev) => (
+                    <tr key={ev._id} className="hover:bg-gray-50 transition" style={{ borderBottom: "1px solid #f8f7f3" }}>
+                      <td className="px-5 py-4">
+                        <p className="text-sm font-semibold" style={{ color: "#111" }}>{ev.title}</p>
+                        <p className="text-xs mt-0.5" style={{ color: "#aaa" }}>{ev.category}</p>
+                      </td>
+                      <td className="px-5 py-4 text-sm" style={{ color: "#666" }}>{formatDate(ev.date)}</td>
+                      <td className="px-5 py-4">
+                        <span className={`text-xs font-semibold px-2.5 py-0.5 rounded-full ${statusClass(ev.status)}`}>{ev.status}</span>
+                      </td>
+                      <td className="px-5 py-4 text-sm">
+                        <span className="font-semibold" style={{ color: "#111" }}>{ev.totalRegistrations}</span>
+                        <span style={{ color: "#aaa" }}> / {ev.capacity}</span>
+                      </td>
+                      <td className="px-5 py-4 text-sm font-semibold" style={{ color: "#111" }}>{ev.totalAttended || 0}</td>
+                      <td className="px-5 py-4">
+                        <div className="flex gap-4">
+                          <Link to={`/attendance/${ev._id}`} className="text-xs font-medium" style={{ color: "#6366f1", textDecoration: "none" }}>Attendance</Link>
+                          <button onClick={() => openEdit(ev)} className="text-xs font-medium bg-transparent border-none cursor-pointer" style={{ color: "#555", fontFamily: "'DM Sans', sans-serif" }}>Edit</button>
+                          <button
+                            onClick={() => handleDelete(ev._id, ev.title)}
+                            disabled={deletingId === ev._id}
+                            className="text-xs font-medium bg-transparent border-none cursor-pointer disabled:opacity-50"
+                            style={{ color: "#ef4444", fontFamily: "'DM Sans', sans-serif" }}
+                          >
+                            {deletingId === ev._id ? "Deleting..." : "Delete"}
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+
+            <div className="flex flex-col gap-3 md:hidden">
+              {events.map((ev) => (
+                <div
+                  key={ev._id}
+                  className="bg-white rounded-2xl p-4 flex flex-col gap-3"
+                  style={{ border: "1px solid #e8e6e0" }}
+                >
+                  <div className="flex items-start justify-between gap-2">
+                    <div>
+                      <p className="text-sm font-semibold" style={{ color: "#111" }}>{ev.title}</p>
+                      <p className="text-xs mt-0.5" style={{ color: "#aaa" }}>{ev.category} · {formatDate(ev.date)}</p>
+                    </div>
+                    <span className={`text-xs font-semibold px-2.5 py-0.5 rounded-full shrink-0 ${statusClass(ev.status)}`}>{ev.status}</span>
+                  </div>
+
+                  <div className="flex gap-4 text-xs" style={{ color: "#888" }}>
+                    <span>
+                      <span className="font-semibold" style={{ color: "#111" }}>{ev.totalRegistrations}</span>
+                      {" "}/ {ev.capacity} registered
+                    </span>
+                    <span>
+                      <span className="font-semibold" style={{ color: "#111" }}>{ev.totalAttended || 0}</span>
+                      {" "}attended
+                    </span>
+                  </div>
+
+                  <div className="flex gap-4 pt-1" style={{ borderTop: "1px solid #f0ede6" }}>
+                    <Link to={`/attendance/${ev._id}`} className="text-xs font-medium" style={{ color: "#6366f1", textDecoration: "none" }}>Attendance</Link>
+                    <button onClick={() => openEdit(ev)} className="text-xs font-medium bg-transparent border-none cursor-pointer" style={{ color: "#555", fontFamily: "'DM Sans', sans-serif" }}>Edit</button>
+                    <button
+                      onClick={() => handleDelete(ev._id, ev.title)}
+                      disabled={deletingId === ev._id}
+                      className="text-xs font-medium bg-transparent border-none cursor-pointer disabled:opacity-50"
+                      style={{ color: "#ef4444", fontFamily: "'DM Sans', sans-serif" }}
+                    >
+                      {deletingId === ev._id ? "Deleting..." : "Delete"}
+                    </button>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </>
         )}
       </div>
 
