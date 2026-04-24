@@ -1,150 +1,190 @@
-import { useState } from "react";
-import { useNavigate, Link } from "react-router-dom";
-import { useDispatch } from "react-redux";
-import api from "../utils/axios.js";
-import { setCredentials } from "../redux/slices/authSlice.js";
+import { useSelector } from "react-redux";
+import { useNavigate } from "react-router-dom";
+import { motion } from "framer-motion";
 
-function Register() {
+const FEATURES = [
+  "QR-based check-in",
+  "Role-based dashboards",
+  "PDF certificates",
+  "Real-time notifications",
+  "Multi-club support",
+];
+
+const STATS = [
+  { value: "12", label: "Active clubs" },
+  { value: "200", label: "Students registered" },
+  { value: "50", label: "Events hosted" },
+];
+
+const fadeUp = (delay = 0) => ({
+  initial: { opacity: 0, y: 24 },
+  animate: { opacity: 1, y: 0 },
+  transition: { duration: 0.6, delay, ease: [0.22, 1, 0.36, 1] },
+});
+
+function Hero() {
   const navigate = useNavigate();
-  const dispatch = useDispatch();
-
-  const [form, setForm] = useState({
-    name: "",
-    email: "",
-    password: "",
-    usn: "",
-    department: "",
-  });
-  const [error, setError] = useState("");
-  const [loading, setLoading] = useState(false);
-
-  const handleChange = (e) => {
-    setForm({ ...form, [e.target.name]: e.target.value });
-  };
-
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    setLoading(true);
-    setError("");
-
-    try {
-      await api.post("/auth/register", form);
-      const loginRes = await api.post("/auth/login", {
-        email: form.email,
-        password: form.password,
-      });
-      dispatch(setCredentials(loginRes.data.data));
-      navigate("/events");
-    } catch (err) {
-      setError(err.response?.data?.message || "Registration failed");
-    } finally {
-      setLoading(false);
-    }
-  };
+  const isAuthenticated = useSelector((state) => state.auth.isAuthenticated);
 
   return (
-    <div className="min-h-screen bg-gray-50 flex items-center justify-center px-4">
-      <div className="bg-white w-full max-w-md rounded-2xl shadow-sm border border-gray-200 p-8">
+    <div className="min-h-screen flex flex-col" style={{ backgroundColor: "#f5f4f0", fontFamily: "'DM Sans', sans-serif" }}>
+      <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;1,9..40,300&family=DM+Serif+Display:ital@0;1&display=swap" rel="stylesheet" />
 
-        <h1 className="text-2xl font-semibold text-gray-900 mb-1">Create account</h1>
-        <p className="text-sm text-gray-500 mb-6">Join CampusBuzz at NMIT</p>
+      <nav className="flex items-center justify-between px-10 py-6">
+        <span style={{ fontFamily: "'DM Serif Display', serif", fontSize: "1.25rem", color: "#111", letterSpacing: "-0.01em" }}>
+          CampusBuzz
+        </span>
 
-        {error && (
-          <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded-lg text-sm text-red-600">
-            {error}
-          </div>
-        )}
-
-        <form onSubmit={handleSubmit} className="flex flex-col gap-4">
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Full Name</label>
-            <input
-              type="text"
-              name="name"
-              value={form.name}
-              onChange={handleChange}
-              placeholder="Enter your full name"
-              required
-              className="w-full px-4 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
-            />
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Email</label>
-            <input
-              type="email"
-              name="email"
-              value={form.email}
-              onChange={handleChange}
-              placeholder="you@nmit.ac.in"
-              required
-              className="w-full px-4 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
-            />
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Password</label>
-            <input
-              type="password"
-              name="password"
-              value={form.password}
-              onChange={handleChange}
-              placeholder="••••••••"
-              required
-              className="w-full px-4 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
-            />
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">USN</label>
-            <input
-              type="text"
-              name="usn"
-              value={form.usn}
-              onChange={handleChange}
-              placeholder="Enter your USN"
-              className="w-full px-4 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
-            />
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Department</label>
-            <select
-              name="department"
-              value={form.department}
-              onChange={handleChange}
-              className="w-full px-4 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 bg-white"
+        <div className="flex items-center gap-2">
+          {isAuthenticated ? (
+            <button
+              onClick={() => navigate("/events")}
+              className="text-sm px-5 py-2 rounded-full cursor-pointer border-none"
+              style={{ backgroundColor: "#111", color: "#f5f4f0", fontFamily: "'DM Sans', sans-serif", letterSpacing: "0.01em" }}
             >
-              <option value="">Select department</option>
-              <option value="CSE">CSE</option>
-              <option value="ISE">ISE</option>
-              <option value="ECE">ECE</option>
-              <option value="EEE">EEE</option>
-              <option value="MECH">MECH</option>
-              <option value="CIVIL">CIVIL</option>
-              <option value="AIDS">AIDS</option>
-              <option value="AIML">AIML</option>
-            </select>
-          </div>
+              Go to Events
+            </button>
+          ) : (
+            <>
+              <button
+                onClick={() => navigate("/login")}
+                className="text-sm px-5 py-2 rounded-full cursor-pointer"
+                style={{ color: "#555", backgroundColor: "transparent", border: "1px solid #d0cfc9", fontFamily: "'DM Sans', sans-serif", letterSpacing: "0.01em" }}
+              >
+                Login
+              </button>
+              <button
+                onClick={() => navigate("/register")}
+                className="text-sm font-medium px-5 py-2 rounded-full cursor-pointer border-none"
+                style={{ backgroundColor: "#111", color: "#f5f4f0", fontFamily: "'DM Sans', sans-serif", letterSpacing: "0.01em" }}
+              >
+                Sign up
+              </button>
+            </>
+          )}
+        </div>
+      </nav>
 
+      <div className="mx-10" style={{ height: "1px", backgroundColor: "#e0dfd9" }} />
+
+      <main className="flex-1 flex flex-col items-center justify-center text-center px-6 py-24">
+
+        <motion.p
+          {...fadeUp(0)}
+          className="text-xs font-medium uppercase mb-8"
+          style={{ letterSpacing: "0.18em", color: "#888" }}
+        >
+          NMIT · Campus Event Platform
+        </motion.p>
+
+        <motion.h1
+          {...fadeUp(0.1)}
+          className="font-normal"
+          style={{
+            fontFamily: "'DM Serif Display', serif",
+            fontSize: "clamp(3.2rem, 7vw, 6.5rem)",
+            lineHeight: 1.05,
+            color: "#111",
+            letterSpacing: "-0.03em",
+            maxWidth: "800px",
+            marginBottom: "0.4rem",
+          }}
+        >
+          Campus events,
+        </motion.h1>
+
+        <motion.h1
+          {...fadeUp(0.18)}
+          className="font-normal"
+          style={{
+            fontFamily: "'DM Serif Display', serif",
+            fontStyle: "italic",
+            fontSize: "clamp(3.2rem, 7vw, 6.5rem)",
+            lineHeight: 1.05,
+            color: "#888",
+            letterSpacing: "-0.03em",
+            maxWidth: "800px",
+            marginBottom: "2.5rem",
+          }}
+        >
+          all in one place.
+        </motion.h1>
+
+        <motion.p
+          {...fadeUp(0.26)}
+          className="text-sm mb-10"
+          style={{ color: "#666", fontWeight: 300, maxWidth: "420px", lineHeight: 1.75 }}
+        >
+          Discover, register, and attend events across all clubs at NMIT.
+          QR-based entry, live attendance, and digital certificates — built for you.
+        </motion.p>
+
+        <motion.div {...fadeUp(0.34)} className="flex items-center gap-3">
           <button
-            type="submit"
-            disabled={loading}
-            className="w-full py-2.5 bg-indigo-500 hover:bg-indigo-600 text-white text-sm font-medium rounded-lg transition disabled:opacity-50 cursor-pointer"
+            onClick={() => navigate(isAuthenticated ? "/events" : "/register")}
+            className="text-sm font-medium px-7 py-3 rounded-full cursor-pointer border-none"
+            style={{ backgroundColor: "#111", color: "#f5f4f0", fontFamily: "'DM Sans', sans-serif", letterSpacing: "0.01em" }}
           >
-            {loading ? "Creating account..." : "Create account"}
+            {isAuthenticated ? "Browse Events" : "Get Started →"}
           </button>
-        </form>
 
-        <p className="text-sm text-gray-500 text-center mt-6">
-          Already have an account?{" "}
-          <Link to="/login" className="text-indigo-500 hover:underline font-medium">
-            Sign in
-          </Link>
-        </p>
-      </div>
+          {!isAuthenticated && (
+            <button
+              onClick={() => navigate("/events")}
+              className="text-sm px-7 py-3 rounded-full cursor-pointer"
+              style={{ color: "#333", backgroundColor: "transparent", border: "1px solid #c8c7c1", fontFamily: "'DM Sans', sans-serif", letterSpacing: "0.01em" }}
+            >
+              Browse Events
+            </button>
+          )}
+        </motion.div>
+
+        <motion.div
+          {...fadeUp(0.44)}
+          className="flex flex-wrap justify-center gap-2 mt-14"
+        >
+          {FEATURES.map((feat) => (
+            <span
+              key={feat}
+              className="text-xs px-4 py-1.5 rounded-full"
+              style={{ color: "#777", backgroundColor: "#eceae4", border: "1px solid #dddbd5", letterSpacing: "0.01em" }}
+            >
+              {feat}
+            </span>
+          ))}
+        </motion.div>
+
+        <motion.div
+          {...fadeUp(0.54)}
+          className="grid grid-cols-3 w-full mt-20"
+          style={{ maxWidth: "560px", borderTop: "1px solid #dddbd5", borderBottom: "1px solid #dddbd5" }}
+        >
+          {STATS.map((stat, i) => (
+            <div
+              key={stat.label}
+              className="flex flex-col items-center py-8"
+              style={{ borderRight: i < STATS.length - 1 ? "1px solid #dddbd5" : "none" }}
+            >
+              <span
+                className="font-normal leading-none"
+                style={{ fontFamily: "'DM Serif Display', serif", fontSize: "2.6rem", color: "#111", letterSpacing: "-0.03em" }}
+              >
+                {stat.value}
+                <span style={{ color: "#aaa", fontSize: "2rem" }}>+</span>
+              </span>
+              <span
+                className="text-xs mt-1.5"
+                style={{ color: "#888", letterSpacing: "0.02em" }}
+              >
+                {stat.label}
+              </span>
+            </div>
+          ))}
+        </motion.div>
+
+      </main>
     </div>
   );
 }
 
-export default Register;
+export default Hero;

@@ -4,24 +4,6 @@ import { useNavigate, Link } from "react-router-dom";
 import { setCredentials } from "../redux/slices/authSlice.js";
 import api from "../utils/axios.js";
 
-const S = {
-  page: { minHeight: "100vh", backgroundColor: "#f5f4f0", fontFamily: "'DM Sans', sans-serif", display: "flex", flexDirection: "column" },
-  nav: { display: "flex", alignItems: "center", justifyContent: "space-between", padding: "24px 40px", borderBottom: "1px solid #e0dfd9" },
-  logo: { fontFamily: "'DM Serif Display', serif", fontSize: "1.2rem", color: "#111", letterSpacing: "-0.01em" },
-  center: { flex: 1, display: "flex", alignItems: "center", justifyContent: "center", padding: "40px 16px" },
-  card: { width: "100%", maxWidth: "420px" },
-  eyebrow: { fontSize: "11px", fontWeight: 500, letterSpacing: "0.16em", color: "#888", textTransform: "uppercase", marginBottom: "16px" },
-  heading: { fontFamily: "'DM Serif Display', serif", fontSize: "2.4rem", fontWeight: 400, color: "#111", letterSpacing: "-0.03em", lineHeight: 1.1, marginBottom: "8px" },
-  sub: { fontSize: "14px", color: "#888", fontWeight: 300, marginBottom: "36px" },
-  label: { display: "block", fontSize: "12px", fontWeight: 500, color: "#555", letterSpacing: "0.04em", textTransform: "uppercase", marginBottom: "8px" },
-  input: { width: "100%", padding: "12px 16px", border: "1px solid #d0cfc9", borderRadius: "10px", fontSize: "14px", color: "#111", backgroundColor: "#faf9f6", outline: "none", boxSizing: "border-box", fontFamily: "'DM Sans', sans-serif" },
-  error: { padding: "12px 16px", border: "1px solid #f0c0b0", backgroundColor: "#fdf0eb", borderRadius: "10px", fontSize: "13px", color: "#a04020", marginBottom: "20px" },
-  btn: { width: "100%", padding: "13px", backgroundColor: "#111", color: "#f5f4f0", border: "none", borderRadius: "100px", fontSize: "14px", fontWeight: 500, cursor: "pointer", fontFamily: "'DM Sans', sans-serif", letterSpacing: "0.01em", marginTop: "8px" },
-  foot: { fontSize: "13px", color: "#888", textAlign: "center", marginTop: "28px" },
-  link: { color: "#111", fontWeight: 500 },
-  divider: { height: "1px", backgroundColor: "#e0dfd9", margin: "28px 0" },
-};
-
 function Login() {
   const dispatch = useDispatch();
   const navigate = useNavigate();
@@ -47,39 +29,90 @@ function Login() {
   };
 
   return (
-    <div style={S.page}>
+    <div className="min-h-screen flex flex-col" style={{ backgroundColor: "#f5f4f0", fontFamily: "'DM Sans', sans-serif" }}>
       <link href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500&family=DM+Serif+Display:ital@0;1&display=swap" rel="stylesheet" />
-      <nav style={S.nav}>
-        <span style={S.logo}>CampusBuzz</span>
-        <Link to="/" style={{ fontSize: "13px", color: "#888", textDecoration: "none" }}>← Home</Link>
+
+      <nav className="flex items-center justify-between px-10 py-5 bg-white" style={{ borderBottom: "1px solid #e0dfd9" }}>
+        <span style={{ fontFamily: "'DM Serif Display', serif", fontSize: "1.2rem", color: "#111", letterSpacing: "-0.01em" }}>
+          CampusBuzz
+        </span>
+        <Link to="/" className="text-sm transition" style={{ color: "#888" }}>← Home</Link>
       </nav>
-      <div style={S.center}>
-        <div style={S.card}>
-          <p style={S.eyebrow}>NMIT · Campus Platform</p>
-          <h1 style={S.heading}>Welcome<br /><span style={{ fontStyle: "italic", color: "#888" }}>back.</span></h1>
-          <p style={S.sub}>Sign in to your CampusBuzz account</p>
 
-          {error && <div style={S.error}>{error}</div>}
+      <div className="flex-1 flex items-center justify-center px-4 py-10">
+        <div className="w-full max-w-md">
 
-          <form onSubmit={handleSubmit} style={{ display: "flex", flexDirection: "column", gap: "18px" }}>
-            <div>
-              <label style={S.label}>Email</label>
-              <input style={S.input} type="email" name="email" value={form.email} onChange={handleChange} placeholder="you@nmit.ac.in" required />
+          <p className="text-xs font-medium uppercase mb-4" style={{ letterSpacing: "0.16em", color: "#888" }}>
+            NMIT · Campus Platform
+          </p>
+
+          <h1 className="mb-2" style={{ fontFamily: "'DM Serif Display', serif", fontSize: "2.4rem", fontWeight: 400, color: "#111", letterSpacing: "-0.03em", lineHeight: 1.1 }}>
+            Welcome<br />
+            <span style={{ fontStyle: "italic", color: "#888" }}>back.</span>
+          </h1>
+
+          <p className="text-sm mb-8" style={{ color: "#888", fontWeight: 300 }}>
+            Sign in to your CampusBuzz account
+          </p>
+
+          {error && (
+            <div className="mb-5 text-sm px-4 py-3 rounded-xl" style={{ backgroundColor: "#fdf0eb", border: "1px solid #f0c0b0", color: "#a04020" }}>
+              {error}
             </div>
+          )}
+
+          <form onSubmit={handleSubmit} className="flex flex-col gap-5">
             <div>
-              <label style={S.label}>Password</label>
-              <input style={S.input} type="password" name="password" value={form.password} onChange={handleChange} placeholder="••••••••" required />
+              <label className="block text-xs font-medium uppercase mb-2" style={{ letterSpacing: "0.04em", color: "#555" }}>
+                Email
+              </label>
+              <input
+                type="email"
+                name="email"
+                value={form.email}
+                onChange={handleChange}
+                placeholder="you@nmit.ac.in"
+                required
+                className="w-full px-4 py-3 text-sm rounded-xl outline-none"
+                style={{ border: "1px solid #d0cfc9", backgroundColor: "#faf9f6", color: "#111", fontFamily: "'DM Sans', sans-serif" }}
+              />
             </div>
-            <button style={{ ...S.btn, opacity: loading ? 0.6 : 1 }} type="submit" disabled={loading}>
+
+            <div>
+              <label className="block text-xs font-medium uppercase mb-2" style={{ letterSpacing: "0.04em", color: "#555" }}>
+                Password
+              </label>
+              <input
+                type="password"
+                name="password"
+                value={form.password}
+                onChange={handleChange}
+                placeholder="••••••••"
+                required
+                className="w-full px-4 py-3 text-sm rounded-xl outline-none"
+                style={{ border: "1px solid #d0cfc9", backgroundColor: "#faf9f6", color: "#111", fontFamily: "'DM Sans', sans-serif" }}
+              />
+            </div>
+
+            <button
+              type="submit"
+              disabled={loading}
+              className="w-full py-3 text-sm font-medium rounded-full transition disabled:opacity-50 cursor-pointer mt-1"
+              style={{ backgroundColor: "#111", color: "#f5f4f0", letterSpacing: "0.01em", fontFamily: "'DM Sans', sans-serif" }}
+            >
               {loading ? "Signing in..." : "Sign in →"}
             </button>
           </form>
 
-          <div style={S.divider} />
-          <p style={S.foot}>
+          <div className="my-7" style={{ height: "1px", backgroundColor: "#e0dfd9" }} />
+
+          <p className="text-sm text-center" style={{ color: "#888" }}>
             Don't have an account?{" "}
-            <Link to="/register" style={S.link}>Register</Link>
+            <Link to="/register" className="font-medium" style={{ color: "#111" }}>
+              Register
+            </Link>
           </p>
+
         </div>
       </div>
     </div>
