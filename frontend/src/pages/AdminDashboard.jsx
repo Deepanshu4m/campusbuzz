@@ -1,9 +1,10 @@
 import { useState, useEffect } from "react";
-import { useSelector } from "react-redux";
+import { useSelector, useDispatch } from "react-redux";
 import { useNavigate, Link } from "react-router-dom";
 import axiosInstance from "../utils/axios.js";
 import { TableRowSkeleton } from "../components/ui/Skeleton.jsx";
 import toast from "react-hot-toast";
+import { fetchCurrentUser } from "../redux/slices/authSlice.js";
 
 const ROLES = ["student", "club_admin", "super_admin"];
 const STATUSES = ["upcoming", "ongoing", "completed", "cancelled"];
@@ -17,6 +18,7 @@ const statusColor = (status) => {
 
 export default function AdminDashboard() {
   const { user } = useSelector((state) => state.auth);
+  const dispatch = useDispatch();
   const navigate = useNavigate();
 
   const [activeTab, setActiveTab] = useState("users");
@@ -61,19 +63,24 @@ export default function AdminDashboard() {
   };
 
   const handleRoleChange = async (userId, newRole) => {
-  setRoleUpdating(userId);
-  try {
-    await axiosInstance.patch(`/admin/users/${userId}/role`, { role: newRole });
-    setUsers((prev) =>
-      prev.map((u) => (u._id === userId ? { ...u, role: newRole } : u))
-    );
-    toast.success("Role updated");
-  } catch (err) {
-    toast.error(err.response?.data?.message || "Role update failed");
-  } finally {
-    setRoleUpdating(null);
-  }
-};
+    if (userId === user._id && newRole !== "super_admin") {
+      toast.error("You cannot change your own role");
+      return;
+    }
+    setRoleUpdating(userId);
+    try {
+      await axiosInstance.patch(`/admin/users/${userId}/role`, { role: newRole });
+      setUsers((prev) =>
+        prev.map((u) => (u._id === userId ? { ...u, role: newRole } : u))
+      );
+      toast.success("Role updated successfully");
+      if (userId === user._id) dispatch(fetchCurrentUser());
+    } catch (err) {
+      toast.error(err.response?.data?.message || "Role update failed");
+    } finally {
+      setRoleUpdating(null);
+    }
+  };
 
   const handleStatusChange = async (eventId, newStatus) => {
     setStatusUpdating(eventId);
@@ -82,13 +89,14 @@ export default function AdminDashboard() {
       setEvents((prev) =>
         prev.map((ev) => (ev._id === eventId ? { ...ev, status: newStatus } : ev))
       );
+      toast.success("Event status updated");
     } catch (err) {
-      console.error(err);
+      toast.error(err.response?.data?.message || "Status update failed");
     } finally {
       setStatusUpdating(null);
     }
   };
-
+  
   const formatDate = (dateStr) =>
     new Date(dateStr).toLocaleDateString("en-IN", {
       day: "numeric",
