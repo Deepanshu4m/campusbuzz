@@ -25,12 +25,14 @@ app.use(express.urlencoded({ extended: true, limit: "16kb" }));
 app.use(express.static("public"));
 app.use(cookieParser());
 
+app.get("/health", (req, res) => res.json({ status: "ok" }));
 app.use("/api/v1/auth", authRouter);
 app.use("/api/v1/events", eventRouter);
 app.use("/api/v1/registrations", registrationRouter);
 app.use("/api/v1/attendance", attendanceRouter);
 app.use("/api/v1/certificates", certificateRouter);
 app.use("/api/v1/admin", adminRouter);
+
 
 app.use((err, req, res, next) => {
   const statusCode = err.statusCode || 500;
