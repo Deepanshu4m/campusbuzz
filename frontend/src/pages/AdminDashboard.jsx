@@ -3,6 +3,7 @@ import { useSelector } from "react-redux";
 import { useNavigate, Link } from "react-router-dom";
 import axiosInstance from "../utils/axios.js";
 import { TableRowSkeleton } from "../components/ui/Skeleton.jsx";
+import toast from "react-hot-toast";
 
 const ROLES = ["student", "club_admin", "super_admin"];
 const STATUSES = ["upcoming", "ongoing", "completed", "cancelled"];
@@ -60,18 +61,19 @@ export default function AdminDashboard() {
   };
 
   const handleRoleChange = async (userId, newRole) => {
-    setRoleUpdating(userId);
-    try {
-      await axiosInstance.patch(`/admin/users/${userId}/role`, { role: newRole });
-      setUsers((prev) =>
-        prev.map((u) => (u._id === userId ? { ...u, role: newRole } : u))
-      );
-    } catch (err) {
-      console.error(err);
-    } finally {
-      setRoleUpdating(null);
-    }
-  };
+  setRoleUpdating(userId);
+  try {
+    await axiosInstance.patch(`/admin/users/${userId}/role`, { role: newRole });
+    setUsers((prev) =>
+      prev.map((u) => (u._id === userId ? { ...u, role: newRole } : u))
+    );
+    toast.success("Role updated");
+  } catch (err) {
+    toast.error(err.response?.data?.message || "Role update failed");
+  } finally {
+    setRoleUpdating(null);
+  }
+};
 
   const handleStatusChange = async (eventId, newStatus) => {
     setStatusUpdating(eventId);

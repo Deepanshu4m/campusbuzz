@@ -271,6 +271,10 @@ function Register() {
             </Link>
           </p>
 
+          <p className="text-xs text-center mt-4" style={{ color: "#bbb" }}>
+            All accounts register as students. Contact the admin to get club access.
+          </p>
+
         </div>
       </div>
     </div>

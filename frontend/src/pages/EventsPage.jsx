@@ -143,7 +143,7 @@ function EventsPage() {
             <button
               onClick={() => navigate("/admin")}
               className="text-sm px-5 py-2 rounded-full cursor-pointer"
-              style={{ color: "#6366f1", backgroundColor: "transparent", border: "1px solid #c7d2fe", fontFamily: "'DM Sans', sans-serif" }}
+              style={{ color: "#555", backgroundColor: "transparent", border: "1px solid #c7d2fe", fontFamily: "'DM Sans', sans-serif" }}
             >
               Admin
             </button>

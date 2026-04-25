@@ -55,7 +55,6 @@ function Hero() {
                 padding: "8px 20px",
                 fontSize: "13px",
                 fontWeight: 400,
-                color: "#111",
                 backgroundColor: "#111",
                 color: "#f5f4f0",
                 borderRadius: "100px",

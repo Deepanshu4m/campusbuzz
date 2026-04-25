@@ -28,7 +28,7 @@ export default function CreateEventPage() {
       const formData = new FormData();
       Object.entries(form).forEach(([key, val]) => formData.append(key, val));
       if (banner) formData.append("banner", banner);
-      await api.post("/events", formData, { headers: { "Content-Type": "multipart/form-data" } });
+      await api.post("/events", formData);
       toast.success("Event created!");
       navigate("/club-dashboard");
     } catch (err) {

@@ -45,11 +45,17 @@ function AnimatedRoutes() {
         <Route element={<ProtectedRoute />}>
           <Route path="/events" element={<PageWrapper><EventsPage /></PageWrapper>} />
           <Route path="/my-registrations" element={<PageWrapper><MyRegistrations /></PageWrapper>} />
-          <Route path="/admin" element={<PageWrapper><AdminDashboard /></PageWrapper>} />
+          <Route path="/events/:id" element={<PageWrapper><EventDetailPage /></PageWrapper>} />
+        </Route>
+
+        <Route element={<ProtectedRoute allowedRoles={["club_admin", "super_admin"]} />}>
           <Route path="/club-dashboard" element={<PageWrapper><ClubAdminDashboard /></PageWrapper>} />
           <Route path="/attendance/:eventId" element={<PageWrapper><AttendancePage /></PageWrapper>} />
           <Route path="/create-event" element={<PageWrapper><CreateEventPage /></PageWrapper>} />
-          <Route path="/events/:id" element={<PageWrapper><EventDetailPage /></PageWrapper>} />
+        </Route>
+
+        <Route element={<ProtectedRoute allowedRoles={["super_admin"]} />}>
+          <Route path="/admin" element={<PageWrapper><AdminDashboard /></PageWrapper>} />
         </Route>
 
         <Route path="*" element={<PageWrapper><NotFound /></PageWrapper>} />

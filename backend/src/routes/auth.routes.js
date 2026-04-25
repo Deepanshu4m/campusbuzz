@@ -17,5 +17,6 @@ router.post("/logout", verifyJWT, logoutUser);
 router.post("/refresh-token", refreshAccessToken);
 router.get("/me", verifyJWT, getCurrentUser);
 router.get("/me/badges", verifyJWT, getMyBadges);
+router.get("/me", verifyJWT, getCurrentUser); 
 
 export default router;
