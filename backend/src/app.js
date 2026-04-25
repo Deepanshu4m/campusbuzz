@@ -10,12 +10,15 @@ import adminRouter from "./routes/admin.routes.js";
 
 const app = express();
 
-app.use(cors({
+const corsOptions = {
   origin: process.env.CORS_ORIGIN || "http://localhost:5173",
   credentials: true,
   methods: ["GET", "POST", "PATCH", "PUT", "DELETE", "OPTIONS"],
   allowedHeaders: ["Content-Type", "Authorization"],
-}));
+};
+
+app.use(cors(corsOptions));
+app.options("/{*path}", cors(corsOptions));
 
 app.use(express.json({ limit: "16kb" }));
 app.use(express.urlencoded({ extended: true, limit: "16kb" }));
@@ -28,7 +31,6 @@ app.use("/api/v1/registrations", registrationRouter);
 app.use("/api/v1/attendance", attendanceRouter);
 app.use("/api/v1/certificates", certificateRouter);
 app.use("/api/v1/admin", adminRouter);
-
 
 app.use((err, req, res, next) => {
   const statusCode = err.statusCode || 500;
