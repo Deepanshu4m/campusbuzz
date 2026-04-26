@@ -19,16 +19,19 @@ const generateTokens = async (userId) => {
 };
 
 const registerUser = asyncHandler(async (req, res) => {
-  const { name, email, password, usn, department, role } = req.body;
+  const { name, email, password, usn, department } = req.body;
 
-  if (!name || !email || !password) {
-    throw new ApiError(400, "Name, email and password are required");
+  if (!name || !email || !password || !usn || !department) {
+    throw new ApiError(400, "All fields are required");
   }
 
   const existing = await User.findOne({ email });
   if (existing) throw new ApiError(409, "Email already registered");
 
-  const user = await User.create({ name, email, password, usn, department, role });
+  const usnExists = await User.findOne({ usn: usn.toUpperCase() });
+  if (usnExists) throw new ApiError(409, "USN already registered");
+
+  const user = await User.create({ name, email, password, usn, department });
   const created = await User.findById(user._id).select("-password -refreshToken");
 
   res.status(201).json(new ApiResponse(201, created, "User registered successfully"));

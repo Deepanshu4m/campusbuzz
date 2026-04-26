@@ -35,7 +35,7 @@ function Register() {
     setLoading(true);
     setError("");
     try {
-      const loginRes = await api.post("/auth/register", form);
+      await api.post("/auth/register", form);
       const loginResponse = await api.post("/auth/login", {
         email: form.email,
         password: form.password,
@@ -206,8 +206,9 @@ function Register() {
                   type="text"
                   name="usn"
                   value={form.usn}
-                  onChange={handleChange}
+                  onChange={(e) => setForm({ ...form, usn: e.target.value.toUpperCase() })}
                   placeholder="1NT23CS056"
+                  required
                   className="w-full px-4 py-3 text-sm rounded-xl outline-none"
                   style={{
                     border: "1px solid #d0cfc9",
@@ -229,6 +230,7 @@ function Register() {
                   name="department"
                   value={form.department}
                   onChange={handleChange}
+                  required
                   className="w-full px-4 py-3 text-sm rounded-xl outline-none cursor-pointer"
                   style={{
                     border: "1px solid #d0cfc9",
