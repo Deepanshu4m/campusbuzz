@@ -86,19 +86,22 @@ export default function EventDetailPage() {
 
   const capacityPercent = Math.min(Math.round((event.registeredCount / event.capacity) * 100), 100);
   const isFull = event.registeredCount >= event.capacity;
+  const isCancelled = event.status === "cancelled";
   const isClosed = !event.isOpen;
-  const isDisabled = registering || alreadyRegistered || isFull || isClosed;
+  const isDisabled = registering || alreadyRegistered || isFull || isClosed || isCancelled;
 
   const btnLabel = registering ? "Registering..."
     : alreadyRegistered ? "Already Registered ✓"
-    : isClosed ? "Registrations Closed"
-    : isFull ? "Event Full"
-    : "Register for this Event →";
+      : isCancelled ? "Event Cancelled"
+        : isClosed ? "Registrations Closed"
+          : isFull ? "Event Full"
+            : "Register for this Event →";
 
   const hintText = alreadyRegistered ? "You're registered. Check My Registrations for your QR code."
-    : isFull ? "This event has reached full capacity."
-    : isClosed ? "Registration window is closed."
-    : null;
+    : isCancelled ? "This event has been cancelled by the organiser."
+      : isFull ? "This event has reached full capacity."
+        : isClosed ? "Registration window is closed."
+          : null;
 
   return (
     <div className="min-h-screen" style={{ backgroundColor: "#f5f4f0", fontFamily: "'DM Sans', sans-serif" }}>

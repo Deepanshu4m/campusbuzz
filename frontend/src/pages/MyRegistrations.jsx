@@ -190,13 +190,15 @@ function MyRegistrations() {
                         </span>
                       </div>
                     </div>
-                    <button
-                      onClick={() => toggleQR(reg._id)}
-                      className="text-xs font-medium ml-4 bg-transparent border-none cursor-pointer shrink-0"
-                      style={{ color: "#6366f1", fontFamily: "'DM Sans', sans-serif" }}
-                    >
-                      {isExpanded ? "Hide QR" : "Show QR"}
-                    </button>
+                    {reg.event?.status !== "cancelled" && (
+                      <button
+                        onClick={() => toggleQR(reg._id)}
+                        className="text-xs font-medium ml-4 bg-transparent border-none cursor-pointer shrink-0"
+                        style={{ color: "#6366f1", fontFamily: "'DM Sans', sans-serif" }}
+                      >
+                        {isExpanded ? "Hide QR" : "Show QR"}
+                      </button>
+                    )}
                   </div>
 
                   <AnimatePresence>

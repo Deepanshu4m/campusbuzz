@@ -39,4 +39,33 @@ const sendRegistrationEmail = async (toEmail, userName, event, qrCode) => {
     });
 };
 
-export { sendRegistrationEmail };
+const sendCancellationEmail = async (toEmail, userName, event) => {
+    const transporter = nodemailer.createTransport({
+        service: "gmail",
+        auth: {
+            user: process.env.GMAIL_USER,
+            pass: process.env.GMAIL_APP_PASSWORD,
+        },
+    });
+
+    await transporter.sendMail({
+        from: `"CampusBuzz" <${process.env.GMAIL_USER}>`,
+        to: toEmail,
+        subject: `Event Cancelled – ${event.title}`,
+        html: `
+      <div style="font-family: sans-serif; max-width: 480px; margin: auto;">
+        <h2 style="color: #ef4444;">Event Cancelled 😔</h2>
+        <p>Hi <strong>${userName}</strong>,</p>
+        <p>We're sorry to inform you that <strong>${event.title}</strong> has been cancelled.</p>
+        <ul>
+          <li><strong>Date:</strong> ${new Date(event.date).toLocaleDateString("en-IN", { day: "numeric", month: "long", year: "numeric" })}</li>
+          <li><strong>Venue:</strong> ${event.venue}</li>
+        </ul>
+        <p>We apologise for the inconvenience. Keep an eye out for future events on CampusBuzz.</p>
+        <p style="color: #9ca3af; font-size: 12px; margin-top: 24px;">CampusBuzz · NMIT</p>
+      </div>
+    `,
+    });
+};
+
+export { sendRegistrationEmail, sendCancellationEmail };
