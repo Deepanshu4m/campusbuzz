@@ -14,6 +14,7 @@ export default function EventDetailPage() {
   const [loading, setLoading] = useState(true);
   const [registering, setRegistering] = useState(false);
   const [alreadyRegistered, setAlreadyRegistered] = useState(false);
+  const [lightboxOpen, setLightboxOpen] = useState(false);
 
   useEffect(() => {
     const fetchAll = async () => {
@@ -33,6 +34,12 @@ export default function EventDetailPage() {
     };
     fetchAll();
   }, [id]);
+
+  useEffect(() => {
+    const handleKey = (e) => { if (e.key === "Escape") setLightboxOpen(false); };
+    window.addEventListener("keydown", handleKey);
+    return () => window.removeEventListener("keydown", handleKey);
+  }, []);
 
   const handleRegister = async () => {
     setRegistering(true);
@@ -113,10 +120,40 @@ export default function EventDetailPage() {
           style={{ border: "1px solid #e8e6e0" }}
         >
           {event.banner ? (
-            <img src={event.banner} alt={event.title} className="w-full h-64 object-cover" />
+            <img
+              src={event.banner}
+              alt={event.title}
+              className="w-full h-64 object-cover"
+              style={{ cursor: "zoom-in" }}
+              onClick={() => setLightboxOpen(true)}
+            />
           ) : (
             <div className="w-full h-64 flex items-center justify-center" style={{ backgroundColor: "#f0ede6" }}>
               <span className="text-xs uppercase tracking-widest" style={{ color: "#ccc" }}>No Banner</span>
+            </div>
+          )}
+
+          {lightboxOpen && (
+            <div
+              onClick={() => setLightboxOpen(false)}
+              style={{
+                position: "fixed", inset: 0, zIndex: 9999,
+                backgroundColor: "rgba(0,0,0,0.85)",
+                display: "flex", alignItems: "center", justifyContent: "center",
+                cursor: "zoom-out",
+              }}
+            >
+              <img
+                src={event.banner}
+                alt={event.title}
+                onClick={(e) => e.stopPropagation()}
+                style={{
+                  maxWidth: "90vw", maxHeight: "90vh",
+                  objectFit: "contain",
+                  borderRadius: "12px",
+                  boxShadow: "0 25px 60px rgba(0,0,0,0.5)",
+                }}
+              />
             </div>
           )}
 
