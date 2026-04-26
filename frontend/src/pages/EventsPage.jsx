@@ -26,7 +26,7 @@ function EventsPage() {
   const [registeredEventIds, setRegisteredEventIds] = useState(new Set());
   const [loading, setLoading] = useState(true);
   const [registeringId, setRegisteringId] = useState(null);
-  const [badgeCount, setBadgeCount] = useState(0);
+  const [regCount, setRegCount] = useState(0);
   const [menuOpen, setMenuOpen] = useState(false);
   const [activeCategory, setActiveCategory] = useState("");
   const [activeStatus, setActiveStatus] = useState("");
@@ -35,8 +35,8 @@ function EventsPage() {
 
   useEffect(() => {
     if (user) {
-      api.get("/auth/me/badges")
-        .then((res) => setBadgeCount(res.data.data.badges.length))
+      api.get("/registrations/my")
+        .then((res) => setRegCount(res.data.data.length))
         .catch(() => { });
     }
   }, [user]);
@@ -111,9 +111,9 @@ function EventsPage() {
 
           <Link to="/my-registrations" className="text-sm relative" style={{ color: "#666", textDecoration: "none" }}>
             My Registrations
-            {badgeCount > 0 && (
+            {regCount > 0 && (
               <span className="absolute -top-2 -right-4 text-white text-[9px] font-bold w-4 h-4 rounded-full flex items-center justify-center" style={{ backgroundColor: "#6366f1" }}>
-                {badgeCount}
+                {regCount}
               </span>
             )}
           </Link>
@@ -169,7 +169,7 @@ function EventsPage() {
         <div className="md:hidden bg-white flex flex-col gap-4 px-6 py-5" style={{ borderBottom: "1px solid #e0dfd9" }}>
           <span className="text-sm" style={{ color: "#888" }}>Hi, {user?.name?.split(" ")[0]}</span>
           <Link to="/my-registrations" onClick={() => setMenuOpen(false)} className="text-sm font-medium" style={{ color: "#6366f1", textDecoration: "none" }}>
-            My Registrations {badgeCount > 0 && `(${badgeCount})`}
+            My Registrations {regCount > 0 && `(${regCount})`}
           </Link>
           {(user?.role === "club_admin" || user?.role === "super_admin") && (
             <>
