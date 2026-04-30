@@ -16,6 +16,7 @@ import ClubAdminDashboard from "./pages/ClubAdminDashboard.jsx";
 import AttendancePage from "./pages/AttendancePage.jsx";
 import CreateEventPage from "./pages/CreateEventPage.jsx";
 import EventDetailPage from "./pages/EventDetailPage.jsx";
+import ProfilePage from "./pages/ProfilePage.jsx";
 import NotFound from "./pages/NotFound.jsx";
 
 const pageVariants = {
@@ -46,6 +47,7 @@ function AnimatedRoutes() {
           <Route path="/events" element={<PageWrapper><EventsPage /></PageWrapper>} />
           <Route path="/my-registrations" element={<PageWrapper><MyRegistrations /></PageWrapper>} />
           <Route path="/events/:id" element={<PageWrapper><EventDetailPage /></PageWrapper>} />
+          <Route path="/profile" element={<PageWrapper><ProfilePage /></PageWrapper>} />
         </Route>
 
         <Route element={<ProtectedRoute allowedRoles={["club_admin", "super_admin"]} />}>
@@ -78,7 +80,6 @@ function AppInner() {
     </BrowserRouter>
   );
 }
-
 
 function App() {
   return (
