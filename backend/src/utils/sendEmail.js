@@ -1,19 +1,11 @@
-import nodemailer from "nodemailer";
+import { Resend } from "resend";
 
-const createTransporter = () =>
-  nodemailer.createTransport({
-    service: "gmail",
-    auth: {
-      user: process.env.GMAIL_USER,
-      pass: process.env.GMAIL_APP_PASSWORD,
-    },
-    family: 4,
-  });
+const resend = new Resend(process.env.RESEND_API_KEY);
 
 const sendRegistrationEmail = async (toEmail, userName, event, qrCode) => {
   const base64Data = qrCode.replace(/^data:image\/png;base64,/, "");
-  await createTransporter().sendMail({
-    from: `"CampusBuzz" <${process.env.GMAIL_USER}>`,
+  await resend.emails.send({
+    from: "CampusBuzz <onboarding@resend.dev>",
     to: toEmail,
     subject: `Registration Confirmed – ${event.title}`,
     html: `
@@ -25,25 +17,15 @@ const sendRegistrationEmail = async (toEmail, userName, event, qrCode) => {
           <li><strong>Date:</strong> ${new Date(event.date).toLocaleDateString("en-IN", { day: "numeric", month: "long", year: "numeric" })}</li>
           <li><strong>Venue:</strong> ${event.venue}</li>
         </ul>
-        <p>Show the QR code below at the entrance:</p>
-        <img src="cid:qrcode" alt="QR Code" style="width:200px;height:200px;" />
         <p style="color: #9ca3af; font-size: 12px; margin-top: 24px;">CampusBuzz · NMIT</p>
       </div>
     `,
-    attachments: [
-      {
-        filename: "qr.png",
-        content: base64Data,
-        encoding: "base64",
-        cid: "qrcode",
-      },
-    ],
   });
 };
 
 const sendCancellationEmail = async (toEmail, userName, event) => {
-  await createTransporter().sendMail({
-    from: `"CampusBuzz" <${process.env.GMAIL_USER}>`,
+  await resend.emails.send({
+    from: "CampusBuzz <onboarding@resend.dev>",
     to: toEmail,
     subject: `Event Cancelled – ${event.title}`,
     html: `
@@ -55,7 +37,7 @@ const sendCancellationEmail = async (toEmail, userName, event) => {
           <li><strong>Date:</strong> ${new Date(event.date).toLocaleDateString("en-IN", { day: "numeric", month: "long", year: "numeric" })}</li>
           <li><strong>Venue:</strong> ${event.venue}</li>
         </ul>
-        <p>We apologise for the inconvenience. Keep an eye out for future events on CampusBuzz.</p>
+        <p>We apologise for the inconvenience.</p>
         <p style="color: #9ca3af; font-size: 12px; margin-top: 24px;">CampusBuzz · NMIT</p>
       </div>
     `,
@@ -63,8 +45,8 @@ const sendCancellationEmail = async (toEmail, userName, event) => {
 };
 
 const sendOTPEmail = async (toEmail, name, otp) => {
-  await createTransporter().sendMail({
-    from: `"CampusBuzz" <${process.env.GMAIL_USER}>`,
+  await resend.emails.send({
+    from: "CampusBuzz <onboarding@resend.dev>",
     to: toEmail,
     subject: "CampusBuzz — Verify Your Email",
     html: `
