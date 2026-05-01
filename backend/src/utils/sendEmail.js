@@ -1,16 +1,18 @@
 import nodemailer from "nodemailer";
 
-const sendRegistrationEmail = async (toEmail, userName, event, qrCode) => {
-  const transporter = nodemailer.createTransport({
+const createTransporter = () =>
+  nodemailer.createTransport({
     service: "gmail",
     auth: {
       user: process.env.GMAIL_USER,
       pass: process.env.GMAIL_APP_PASSWORD,
     },
+    family: 4,
   });
-  const base64Data = qrCode.replace(/^data:image\/png;base64,/, "");
 
-  await transporter.sendMail({
+const sendRegistrationEmail = async (toEmail, userName, event, qrCode) => {
+  const base64Data = qrCode.replace(/^data:image\/png;base64,/, "");
+  await createTransporter().sendMail({
     from: `"CampusBuzz" <${process.env.GMAIL_USER}>`,
     to: toEmail,
     subject: `Registration Confirmed – ${event.title}`,
@@ -40,15 +42,7 @@ const sendRegistrationEmail = async (toEmail, userName, event, qrCode) => {
 };
 
 const sendCancellationEmail = async (toEmail, userName, event) => {
-  const transporter = nodemailer.createTransport({
-    service: "gmail",
-    auth: {
-      user: process.env.GMAIL_USER,
-      pass: process.env.GMAIL_APP_PASSWORD,
-    },
-  });
-
-  await transporter.sendMail({
+  await createTransporter().sendMail({
     from: `"CampusBuzz" <${process.env.GMAIL_USER}>`,
     to: toEmail,
     subject: `Event Cancelled – ${event.title}`,
@@ -69,15 +63,7 @@ const sendCancellationEmail = async (toEmail, userName, event) => {
 };
 
 const sendOTPEmail = async (toEmail, name, otp) => {
-  const transporter = nodemailer.createTransport({
-    service: "gmail",
-    auth: {
-      user: process.env.GMAIL_USER,
-      pass: process.env.GMAIL_APP_PASSWORD,
-    },
-  });
-
-  await transporter.sendMail({
+  await createTransporter().sendMail({
     from: `"CampusBuzz" <${process.env.GMAIL_USER}>`,
     to: toEmail,
     subject: "CampusBuzz — Verify Your Email",
