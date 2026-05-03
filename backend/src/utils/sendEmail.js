@@ -1,11 +1,19 @@
-import { Resend } from "resend";
+import nodemailer from "nodemailer";
 
-const resend = new Resend(process.env.RESEND_API_KEY);
+const transporter = nodemailer.createTransport({
+  host: "smtp-relay.brevo.com",
+  port: 587,
+  secure: false,
+  auth: {
+    user: process.env.BREVO_SMTP_USER,
+    pass: process.env.BREVO_SMTP_PASS,
+  },
+});
 
 const sendRegistrationEmail = async (toEmail, userName, event, qrCode) => {
   const base64Data = qrCode.replace(/^data:image\/png;base64,/, "");
-  await resend.emails.send({
-    from: "CampusBuzz <onboarding@resend.dev>",
+  await transporter.sendMail({
+    from: '"CampusBuzz" <noreply@campusbuzz.in>',
     to: toEmail,
     subject: `Registration Confirmed – ${event.title}`,
     html: `
@@ -24,8 +32,8 @@ const sendRegistrationEmail = async (toEmail, userName, event, qrCode) => {
 };
 
 const sendCancellationEmail = async (toEmail, userName, event) => {
-  await resend.emails.send({
-    from: "CampusBuzz <onboarding@resend.dev>",
+  await transporter.sendMail({
+    from: '"CampusBuzz" <noreply@campusbuzz.in>',
     to: toEmail,
     subject: `Event Cancelled – ${event.title}`,
     html: `
@@ -45,8 +53,8 @@ const sendCancellationEmail = async (toEmail, userName, event) => {
 };
 
 const sendOTPEmail = async (toEmail, name, otp) => {
-  await resend.emails.send({
-    from: "CampusBuzz <onboarding@resend.dev>",
+  await transporter.sendMail({
+    from: '"CampusBuzz" <noreply@campusbuzz.in>',
     to: toEmail,
     subject: "CampusBuzz — Verify Your Email",
     html: `
