@@ -1,9 +1,8 @@
 # CampusBuzz
 
-**CampusBuzz** is a full-stack college event management platform built for NMIT. It supports three user roles — Student, Club Admin, and Super Admin — and handles everything from event creation and registration to QR-based attendance, PDF certificates, and real-time notifications.
+**CampusBuzz** is a full-stack college event management platform. It supports three user roles — Student, Club Admin, and Super Admin, and handles everything from event creation and registration to QR-based attendance, PDF certificates, and real-time notifications.
 
 🌐 **Live Demo:** [campusbuzz-delta.vercel.app](https://campusbuzz-delta.vercel.app)
-🔧 **Backend:** [campusbuzz-jih6.onrender.com](https://campusbuzz-jih6.onrender.com)
 
 ---
 
@@ -219,6 +218,8 @@ GMAIL_USER=
 GMAIL_APP_PASSWORD=
 
 NODE_ENV=development
+BREVO_SMTP_USER=your_brevo_login_email
+BREVO_SMTP_PASS=your_brevo_smtp_key
 ```
 
 ### Frontend `.env`
@@ -229,13 +230,6 @@ VITE_API_URL=http://localhost:8000
 
 ---
 
-## Known Issues / Roadmap
-
-- [ ] **OTP email on Render** — SMTP ports 465/587 are blocked on Render. Fix: migrate to Brevo SMTP (300 emails/day free, no domain needed).
-- [ ] **Auto event status transitions** — cron job to move events from `upcoming → ongoing → completed` automatically. `cancelled` remains manual only.
-
----
-
 ## License
 
-MIT © Deepanshu Bisht
+© Deepanshu Bisht
