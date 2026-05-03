@@ -48,13 +48,16 @@ function EventsPage() {
       if (category) params.append("category", category);
       if (status) params.append("status", status);
 
-      const [eventsRes, myRegsRes] = await Promise.all([
-        api.get(`/events?${params.toString()}`),
-        api.get("/registrations/my"),
-      ]);
+      const eventsRes = await api.get(`/events?${params.toString()}`);
       setEvents(eventsRes.data.data.events);
-      const ids = new Set(myRegsRes.data.data.map((r) => r.event._id));
-      setRegisteredEventIds(ids);
+
+      try {
+        const myRegsRes = await api.get("/registrations/my");
+        const ids = new Set(myRegsRes.data.data.map((r) => r.event._id));
+        setRegisteredEventIds(ids);
+      } catch {
+        setRegisteredEventIds(new Set());
+      }
     } catch {
       toast.error("Failed to load events");
     } finally {
