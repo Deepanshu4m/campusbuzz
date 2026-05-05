@@ -19,12 +19,16 @@ export default function EventDetailPage() {
   useEffect(() => {
     const fetchAll = async () => {
       try {
-        const [eventRes, myRegsRes] = await Promise.all([
-          api.get(`/events/${id}`),
-          api.get("/registrations/my"),
-        ]);
+        const eventRes = await api.get(`/events/${id}`);
         setEvent(eventRes.data.data);
-        setAlreadyRegistered(myRegsRes.data.data.some((r) => r.event._id === id));
+
+        if (user) {
+          try {
+            const myRegsRes = await api.get("/registrations/my");
+            setAlreadyRegistered(myRegsRes.data.data.some((r) => r.event._id === id));
+          } catch {
+          }
+        }
       } catch {
         toast.error("Event not found");
         navigate("/events");
