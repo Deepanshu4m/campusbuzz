@@ -121,7 +121,7 @@ function EventsPage() {
             )}
           </Link>
 
-          <span className="text-sm" style={{ color: "#bbb" }}>Hi, {user?.name?.split(" ")[0]}</span>
+          <Link to="/profile" className="text-sm" style={{ color: "#bbb", textDecoration: "none" }}>Hi, {user?.name?.split(" ")[0]}</Link>
 
           {(user?.role === "club_admin" || user?.role === "super_admin") && (
             <>
@@ -170,7 +170,8 @@ function EventsPage() {
 
       {menuOpen && (
         <div className="md:hidden bg-white flex flex-col gap-4 px-6 py-5" style={{ borderBottom: "1px solid #e0dfd9" }}>
-          <span className="text-sm" style={{ color: "#888" }}>Hi, {user?.name?.split(" ")[0]}</span>
+          <Link to="/profile" onClick={() => setMenuOpen(false)} className="text-sm" style={{ color: "#888", textDecoration: "none" }}>Hi, {user?.name?.split(" ")[0]}</Link>
+
           <Link to="/my-registrations" onClick={() => setMenuOpen(false)} className="text-sm font-medium" style={{ color: "#6366f1", textDecoration: "none" }}>
             My Registrations {regCount > 0 && `(${regCount})`}
           </Link>
