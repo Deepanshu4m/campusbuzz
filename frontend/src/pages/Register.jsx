@@ -45,6 +45,7 @@ function Register() {
       toast.success("OTP sent to your email!");
     } catch (err) {
       toast.error(err.response?.data?.message || "Registration failed");
+      setForm((prev) => ({ ...prev, password: "" }));
     } finally {
       setLoading(false);
     }

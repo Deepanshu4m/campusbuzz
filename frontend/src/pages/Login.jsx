@@ -23,6 +23,7 @@ function Login() {
       navigate("/events");
     } catch (err) {
       setError(err.response?.data?.message || "Login failed");
+      setForm((prev) => ({ ...prev, password: "" }));
     } finally {
       setLoading(false);
     }
